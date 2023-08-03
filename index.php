@@ -10,7 +10,7 @@ include("header.php");
         <!-- Add appropriate input fields for app_status, jobseeker_fname, etc. -->
         <button type="button" id="insertButton">Insert Data</button>
     </form>
-	<table id="data_table" class="table table-striped">
+	<table id="data_table" class="table table-striped table-bordered">
 		<thead>
 			<tr>
 				<th>#</th>
