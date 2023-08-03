@@ -28,7 +28,7 @@ if ($input['action'] == 'edit') {
 	} else if(isset($input['exp_years'])) {
 		$update_field.= "exp_years='".$input['exp_years']."'";
 	} else if(isset($input['eligibility'])) {
-		$update_field.= "eligibility='".$input['Eligibility']."'";
+		$update_field.= "eligibility='".$input['eligibility']."'";
 	} else if(isset($input['skype_id'])) {
 		$update_field.= "skype_id='".$input['skype_id']."'";
 	} else if(isset($input['date_encoded'])) {
