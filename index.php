@@ -1,16 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHR - Excel</title>
+</head>
+<body>
 <?php 
 include_once("db_connect.php");
 include("header.php"); 
 ?>
 <title>Excel /a></title>
 <script type="text/javascript" src="dist/jquery.tabledit.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
 <div class="container home">		 
 	<form id="developerForm">
         <!-- Input fields for developer data -->
         <!-- Add appropriate input fields for app_status, jobseeker_fname, etc. -->
-        <button type="button" id="insertButton">Insert Data</button>
+        <button type="button" id="insertButton" class="btn btn-primary">Insert Row</button>
     </form>
-	<table id="data_table" class="table table-striped table-bordered">
+	<table id="data_table" class="table table-striped table-bordered table-dark">
 		<thead>
 			<tr>
 				<th>#</th>
@@ -124,10 +133,12 @@ include("header.php");
 });
 
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
 <script type="text/javascript" src="custom_table_edit.js"></script>
 <?php include('footer.php');?>
  
-
+</body>
+</html>
 
 
                                                                                                        
