@@ -13,22 +13,48 @@ include("header.php");
 <title>Excel</title>
 <script type="text/javascript" src="dist/jquery.tabledit.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-<div class="container-fluid home m-5">		 
-	
-	<form action="insert_null_rows.php" method="post">
-        Number of Rows to Insert: <input type="number" name="num_rows" min="1" required>
-        <input type="submit" value="Insert Rows" class="btn btn-primary">
-    </form>
-    <form id="addColumnForm">
-        <label for="newColumnName">New Column Name:</label>
-        <input type="text" id="newColumnName" name="newColumnName" required>
-        <button type="submit" id="addColumnBtn" class="btn btn-primary">Add Column</button>
-    </form>
+<div class="container-fluid home m-5">
+    
+    <div class="container">
+        <div class="card p-5">
+            <div class="row">
+                <div class="col-3">
+                    <form action="insert_null_rows.php" method="post">
+                        <div class="form-group">
+                            <label for="num_rows" class="mb-2">Number of Rows to Insert:</label>
+                            <input type="number" class="form-control mb-2" id="num_rows" name="num_rows" min="1" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add Rows</button>
+                    </form>
+                </div>
+            
+                <div class="col-3">
+                    <form id="addColumnForm">
+                        <div class="form-group">
+                            <label for="newColumnName" class="mb-2">New Column Name:</label>
+                            <input type="text" class="form-control mb-2" id="newColumnName" name="newColumnName" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-layout-three-columns"></i> Add Column</button>
+                    </form>
+                </div>
+                
+                <div class="col-3">
+                    <form action="reset.php" method="post" class="mt-3">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-clockwise"></i> Reset Table</button>
+                    </form>
+                </div>
 
-    <form action="reset.php" method="post">
-        <input type="submit" value="Reset All Values" class="btn btn-primary">
-    </form>
-	<table id="data_table" class="table table-striped table-bordered">
+                <div class="col-3">
+                    <form action="reset.php" method="post" class="mt-3">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-download"></i> Export</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+	
+	
+	<table id="data_table" class="table table-striped table-bordered table-hover mt-5">
 		<thead>
 			<tr class="text-center">
 				<th>#</th>
@@ -86,7 +112,7 @@ include("header.php");
 	<form id="developerForm">
         <!-- Input fields for developer data -->
         <!-- Add appropriate input fields for app_status, jobseeker_fname, etc. -->
-        <button type="button" id="insertButton" class="btn btn-primary">Insert Row</button>
+        <button type="button" id="insertButton" class="btn btn-primary"><i class="bi bi-plus-square"></i> Insert Row</button>
     </form>
 </div>
 <script>
