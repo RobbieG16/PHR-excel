@@ -10,31 +10,27 @@
 include_once("db_connect.php");
 include("header.php"); 
 ?>
-<title>Excel /a></title>
+<title>Excel</title>
 <script type="text/javascript" src="dist/jquery.tabledit.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-<div class="container home">		 
-	<form id="developerForm">
-        <!-- Input fields for developer data -->
-        <!-- Add appropriate input fields for app_status, jobseeker_fname, etc. -->
-        <button type="button" id="insertButton" class="btn btn-primary">Insert Row</button>
-    </form>
+<div class="container-fluid home m-5">		 
+	
 	<form action="insert_null_rows.php" method="post">
         Number of Rows to Insert: <input type="number" name="num_rows" min="1" required>
-        <input type="submit" value="Insert Rows">
+        <input type="submit" value="Insert Rows" class="btn btn-primary">
     </form>
     <form id="addColumnForm">
         <label for="newColumnName">New Column Name:</label>
         <input type="text" id="newColumnName" name="newColumnName" required>
-        <button type="submit" id="addColumnBtn">Add Column</button>
+        <button type="submit" id="addColumnBtn" class="btn btn-primary">Add Column</button>
     </form>
 
     <form action="reset.php" method="post">
-        <input type="submit" value="Reset All Values">
+        <input type="submit" value="Reset All Values" class="btn btn-primary">
     </form>
 	<table id="data_table" class="table table-striped table-bordered">
 		<thead>
-			<tr>
+			<tr class="text-center">
 				<th>#</th>
 				<th>App Status</th>
                 <th>First Name</th>
@@ -63,7 +59,7 @@ include("header.php");
 			while( $developer = mysqli_fetch_assoc($resultset) ) {
 			?>
 			
-			   <tr id="<?php echo $developer ['id']; ?>">
+			   <tr id="<?php echo $developer ['id']; ?>" style="height: 55px;">
 			   <td><?php echo $developer ['id']; ?></td>
 			   <td><?php echo $developer ['app_status']; ?></td>
 			   <td><?php echo $developer ['jobseeker_fname']; ?></td>
@@ -87,7 +83,11 @@ include("header.php");
 			<?php } ?>
 		</tbody>
     </table>	
-	
+	<form id="developerForm">
+        <!-- Input fields for developer data -->
+        <!-- Add appropriate input fields for app_status, jobseeker_fname, etc. -->
+        <button type="button" id="insertButton" class="btn btn-primary">Insert Row</button>
+    </form>
 </div>
 <script>
 	$(document).ready(function () {

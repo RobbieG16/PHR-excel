@@ -3,10 +3,7 @@ $(document).ready(function () {
     deleteButton: false,
     editButton: false,
     columns: {
-      identifier: [
-        [0, "id"],
-        [16, "recruiter"],
-      ],
+      identifier: [0, "id"],
       editable: [
         [1, "app_status"],
         [2, "jobseeker_fname"],
