@@ -19,7 +19,20 @@ include("header.php");
         <!-- Add appropriate input fields for app_status, jobseeker_fname, etc. -->
         <button type="button" id="insertButton" class="btn btn-primary">Insert Row</button>
     </form>
-	<table id="data_table" class="table table-striped table-bordered table-dark">
+	<form action="insert_null_rows.php" method="post">
+        Number of Rows to Insert: <input type="number" name="num_rows" min="1" required>
+        <input type="submit" value="Insert Rows">
+    </form>
+    <form id="addColumnForm">
+        <label for="newColumnName">New Column Name:</label>
+        <input type="text" id="newColumnName" name="newColumnName" required>
+        <button type="submit" id="addColumnBtn">Add Column</button>
+    </form>
+
+    <form action="reset.php" method="post">
+        <input type="submit" value="Reset All Values">
+    </form>
+	<table id="data_table" class="table table-striped table-bordered">
 		<thead>
 			<tr>
 				<th>#</th>
@@ -39,6 +52,8 @@ include("header.php");
         	    <th>Skype</th>
 				<th>Date Encoded</th>
         	    <th>Recruiter</th>
+                <!-- for another add of column -->
+        	    <th>test</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -65,7 +80,9 @@ include("header.php");
 			   <td><?php echo $developer ['eligibility']; ?></td>   
 			   <td><?php echo $developer ['skype_id']; ?></td>   
 			   <td><?php echo $developer ['date_encoded']; ?></td>   
-			   <td><?php echo $developer ['recruiter']; ?></td>   
+			   <td><?php echo $developer ['recruiter']; ?></td>  
+               <!-- // for another add of column -->
+               <td><?php echo $developer ['testing']; ?></td>   
 			   </tr>
 			<?php } ?>
 		</tbody>
@@ -133,6 +150,37 @@ include("header.php");
 });
 
 </script>
+
+<script>
+  document.getElementById('addColumnForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const newColumnName = document.getElementById('newColumnName').value;
+
+    // Call a PHP script to insert the column into the database
+    insertColumnToDatabase(newColumnName);
+  });
+
+  function insertColumnToDatabase(columnName) {
+    // Make an AJAX request to a PHP script to handle the database insertion
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'insert_column.php', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+        if (xhr.status === 200) {
+          alert(xhr.responseText); // Show the response from the server (success message or error)
+        } else {
+          alert('Error: ' + xhr.status);
+        }
+      }
+    };
+
+    xhr.send('columnName=' + encodeURIComponent(columnName));
+  }
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
 <script type="text/javascript" src="custom_table_edit.js"></script>
 <?php include('footer.php');?>
