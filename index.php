@@ -164,7 +164,6 @@ include("header.php");
             url: "insert_developer.php", // Replace with the actual PHP file name and path
             data: formData,
             success: function (response) {
-                alert("Data inserted successfully!");
 				window.location.reload();
                 // You can handle the response here if needed
             },
