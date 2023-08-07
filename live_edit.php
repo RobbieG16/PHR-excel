@@ -38,6 +38,7 @@ if ($input['action'] == 'edit') {
 	} else if(isset($input['recruiter'])) {
 		$update_field.= "recruiter='".$input['recruiter']."'";
 	}	
+	// for another add of column
 	if($update_field && $input['id']) {
 		$sql_query = "UPDATE developers SET $update_field WHERE id='" . $input['id'] . "'";	
 		mysqli_query($conn, $sql_query) or die("database error:". mysqli_error($conn));		

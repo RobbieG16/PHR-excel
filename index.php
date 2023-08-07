@@ -10,18 +10,53 @@
 include_once("db_connect.php");
 include("header.php"); 
 ?>
-<title>Excel /a></title>
+<title>Excel</title>
 <script type="text/javascript" src="dist/jquery.tabledit.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-<div class="container home">		 
-	<form id="developerForm">
-        <!-- Input fields for developer data -->
-        <!-- Add appropriate input fields for app_status, jobseeker_fname, etc. -->
-        <button type="button" id="insertButton" class="btn btn-primary">Insert Row</button>
-    </form>
-	<table id="data_table" class="table table-striped table-bordered table-dark">
+<div class="container-fluid home m-5">
+    
+    <div class="container">
+        <div class="card p-5">
+            <div class="row">
+                <div class="col-3">
+                    <form action="insert_null_rows.php" method="post">
+                        <div class="form-group">
+                            <label for="num_rows" class="mb-2">Number of Rows to Insert:</label>
+                            <input type="number" class="form-control mb-2" id="num_rows" name="num_rows" min="1" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add Rows</button>
+                    </form>
+                </div>
+            
+                <div class="col-3">
+                    <form id="addColumnForm">
+                        <div class="form-group">
+                            <label for="newColumnName" class="mb-2">New Column Name:</label>
+                            <input type="text" class="form-control mb-2" id="newColumnName" name="newColumnName" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-layout-three-columns"></i> Add Column</button>
+                    </form>
+                </div>
+                
+                <div class="col-3">
+                    <form action="reset.php" method="post" class="mt-3">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-clockwise"></i> Reset Table</button>
+                    </form>
+                </div>
+
+                <div class="col-3">
+                    <form action="reset.php" method="post" class="mt-3">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-download"></i> Export</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+	
+	
+	<table id="data_table" class="table table-striped table-bordered table-hover mt-5">
 		<thead>
-			<tr>
+			<tr class="text-center">
 				<th>#</th>
 				<th>App Status</th>
                 <th>First Name</th>
@@ -39,6 +74,8 @@ include("header.php");
         	    <th>Skype</th>
 				<th>Date Encoded</th>
         	    <th>Recruiter</th>
+                <!-- for another add of column -->
+        	    <th>test</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -48,7 +85,7 @@ include("header.php");
 			while( $developer = mysqli_fetch_assoc($resultset) ) {
 			?>
 			
-			   <tr id="<?php echo $developer ['id']; ?>">
+			   <tr id="<?php echo $developer ['id']; ?>" style="height: 55px;">
 			   <td><?php echo $developer ['id']; ?></td>
 			   <td><?php echo $developer ['app_status']; ?></td>
 			   <td><?php echo $developer ['jobseeker_fname']; ?></td>
@@ -65,12 +102,18 @@ include("header.php");
 			   <td><?php echo $developer ['eligibility']; ?></td>   
 			   <td><?php echo $developer ['skype_id']; ?></td>   
 			   <td><?php echo $developer ['date_encoded']; ?></td>   
-			   <td><?php echo $developer ['recruiter']; ?></td>   
+			   <td><?php echo $developer ['recruiter']; ?></td>  
+               <!-- // for another add of column -->
+               <td><?php echo $developer ['testing']; ?></td>   
 			   </tr>
 			<?php } ?>
 		</tbody>
     </table>	
-	
+	<form id="developerForm">
+        <!-- Input fields for developer data -->
+        <!-- Add appropriate input fields for app_status, jobseeker_fname, etc. -->
+        <button type="button" id="insertButton" class="btn btn-primary"><i class="bi bi-plus-square"></i> Insert Row</button>
+    </form>
 </div>
 <script>
 	$(document).ready(function () {
@@ -121,7 +164,6 @@ include("header.php");
             url: "insert_developer.php", // Replace with the actual PHP file name and path
             data: formData,
             success: function (response) {
-                alert("Data inserted successfully!");
 				window.location.reload();
                 // You can handle the response here if needed
             },
@@ -133,6 +175,37 @@ include("header.php");
 });
 
 </script>
+
+<script>
+  document.getElementById('addColumnForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const newColumnName = document.getElementById('newColumnName').value;
+
+    // Call a PHP script to insert the column into the database
+    insertColumnToDatabase(newColumnName);
+  });
+
+  function insertColumnToDatabase(columnName) {
+    // Make an AJAX request to a PHP script to handle the database insertion
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'insert_column.php', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+        if (xhr.status === 200) {
+          alert(xhr.responseText); // Show the response from the server (success message or error)
+        } else {
+          alert('Error: ' + xhr.status);
+        }
+      }
+    };
+
+    xhr.send('columnName=' + encodeURIComponent(columnName));
+  }
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
 <script type="text/javascript" src="custom_table_edit.js"></script>
 <?php include('footer.php');?>
