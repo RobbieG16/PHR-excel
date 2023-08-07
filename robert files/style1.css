@@ -1,0 +1,152 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #8badf7;
+    /* Center and scale the image nicely */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    height: 100;
+    min-height: 380px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 80%;
+    margin: 0 auto;
+    border: 2px solid #333;
+}
+
+th {
+    background-color: rgb(131, 130, 218);
+    color: rgb(255, 255, 255);
+    padding: 12px;
+    text-align: center;
+}
+
+td {
+    border: 1px solid #000000;
+    padding: 12px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+tr:nth-child(even) td {
+    background-color: rgb(163, 163, 163);
+}
+
+tr:nth-child(odd) td {
+    background-color: rgb(250, 250, 250);
+}
+
+td[contenteditable="true"]:focus {
+    outline: 2px solid rgb(255, 0, 170);
+}
+
+
+.example1 {
+    height: 35px;
+    overflow: hidden;
+    position: relative;
+}
+
+.example1 h3 {
+    font-size: 1.5em;
+    color: rgb(0, 4, 228);
+    position: absolute;
+    width: 70%;
+    height: 80%;
+    margin: 0;
+    line-height: 50px;
+    text-align: center;
+    /* Starting position */
+    -moz-transform: translateX(100%);
+    -webkit-transform: translateX(100%);
+    transform: translateX(100%);
+    /* Apply animation to this element */
+    -moz-animation: example1 15s linear infinite;
+    -webkit-animation: example1 15s linear infinite;
+    animation: example1 15s linear infinite;
+}
+
+/* Move it (define the animation) */
+@-moz-keyframes example1 {
+    0% {
+        -moz-transform: translateX(100%);
+    }
+
+    100% {
+        -moz-transform: translateX(-100%);
+    }
+}
+
+@-webkit-keyframes example1 {
+    0% {
+        -webkit-transform: translateX(100%);
+    }
+
+    100% {
+        -webkit-transform: translateX(-100%);
+    }
+}
+
+@keyframes example1 {
+    0% {
+        -moz-transform: translateX(100%);
+        /* Firefox bug fix */
+        -webkit-transform: translateX(100%);
+        /* Firefox bug fix */
+        transform: translateX(100%);
+    }
+
+    100% {
+        -moz-transform: translateX(-100%);
+        /* Firefox bug fix */
+        -webkit-transform: translateX(-100%);
+        /* Firefox bug fix */
+        transform: translateX(-100%);
+    }
+}
+
+.avatar-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 20px;
+}
+
+#userAvatar {
+    max-width: 40px;
+    max-height: 40px;
+
+    border-radius: 50%; /* Make the image circular */
+}
+
+.user-info {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #f2f2f200;
+    margin-bottom: 20px;
+}
+
+#userColor {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #000;
+}
+
+.color-sample {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 1px solid #000;
+    margin: 2px;
+}
+
+.modal-body {
+    max-height: 400px;
+    overflow-y: auto;
+}
