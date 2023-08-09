@@ -20,11 +20,12 @@ $(document).ready(function () {
         [13, "eligibility"],
         [14, "skype_id"],
         [15, "date_encoded"],
+        [16, "recruiter"],
         // for another add of column
         [17, "testing"],
       ],
     },
-    hideIdentifier: true,
+    hideIdentifier: false,
     url: "live_edit.php",
   });
 });
