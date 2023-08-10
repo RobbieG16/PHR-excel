@@ -1,6 +1,6 @@
 <?php
 // Include the connection file
-include 'conn.php';
+include 'db_connect.php';
 
 // Check if the request is a POST request
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -32,3 +32,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 ?>
+<script>
+    const selectedUserDetails = <?php echo json_encode($selectedUserDetails); ?>;
+</script>

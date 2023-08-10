@@ -20,7 +20,7 @@ if (isset($_POST['columnName'])) {
     $addColumnQuery = "ALTER TABLE developers ADD $columnName VARCHAR(255)";
     
     if ($conn->query($addColumnQuery) === TRUE) {
-        echo "<script>window.location.replace('index.php');</script>";
+        echo "Successful adding new column";
     } else {
         echo "Error adding column: " . $conn->error;
     }
