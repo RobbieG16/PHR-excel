@@ -9,6 +9,16 @@
 <?php 
 include_once("db_connect.php");
 include("header.php"); 
+// Fetch column names from the 'developers' table
+$columns_query = "SHOW COLUMNS FROM developers";
+$columns_result = mysqli_query($conn, $columns_query) or die("database error: " . mysqli_error($conn));
+
+$column_names = array();
+while ($column = mysqli_fetch_assoc($columns_result)) {
+    if ($column['Field'] !== 'id') { // Exclude the 'id' column
+        $column_names[] = $column['Field'];
+    }
+}
 ?>
 <title>Excel</title>
 <script type="text/javascript" src="dist/jquery.tabledit.js"></script>
@@ -175,11 +185,116 @@ include("header.php");
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-primary" onclick="saveUserDetails()">Save changes</button>
       </div>
     </div>
   </div>
 </div>
+<script>    // Disable the selected avatar and color in the color picker and avatar options
+function disableSelectedOptions() {
+    const selectedAvatar = selectedUserDetails.avatar;
+    const selectedColor = selectedUserDetails.color;
+
+    const avatarRadios = document.querySelectorAll("input[name='avatar']");
+    for (const radio of avatarRadios) {
+        if (radio.value === selectedAvatar) {
+            radio.disabled = true;
+        }
+    }
+
+    const colorRadios = document.querySelectorAll("input[name='color']");
+    for (const radio of colorRadios) {
+        if (radio.value === selectedColor) {
+            radio.disabled = true;
+        }
+    }
+
+}
+$('#myModal').on('shown.bs.modal', function () {
+    disableSelectedOptions();
+});
+
+</script>
+<script>
+function saveUserDetails() {
+    const username = document.getElementById("username").value;
+    const avatar = document.querySelector("input[name='avatar']:checked").value;
+    const color = document.querySelector("input[name='color']:checked").value;
+
+    // Update the focus color of editable cells
+    const editableCells = document.querySelectorAll("td[contenteditable='true']");
+    for (const cell of editableCells) {
+        cell.style.outlineColor = color;
+    }
+
+    // Display selected avatar and color in the user-info section
+    const userAvatar = document.getElementById("userAvatar");
+    userAvatar.src = "avatars/" + avatar + ".jpg"; // Set the source of the selected avatar image
+    userAvatar.style.border = "3px solid " + color; // Set the border color of the user avatar    
+
+    // AJAX request to send user details to the server
+    saveUserToDatabase(username, avatar, color);
+
+
+
+    // Function to send user details to the backend for saving in the database
+function saveUserToDatabase(username, avatar, color) {
+    // Create an object to hold the user details
+    const userDetails = {
+        username: username,
+        avatar: avatar,
+        color: color
+    };
+
+    // Send a POST request to the PHP file on the server
+    $.ajax({
+        type: "POST",
+        url: "save_user_details.php", // Replace with the actual URL to your PHP file
+        data: userDetails,
+        dataType: "json",
+        success: function(response) {
+            // Check the response from the server for any errors or success messages
+            if (response.success) {
+                // The user details were saved successfully
+                console.log("User details saved in the database.");
+                $("#userDetailsModal").modal("hide");
+            } else {
+                // There was an error saving the user details
+                console.error("Error saving user details:", response.error);
+                // Display the error as a pop-up using the built-in alert function
+                alert("Error: " + response.error);
+            }
+        },
+        error: function(xhr, status, error) {
+            // Handle any errors that occur during the AJAX request
+            console.error("AJAX error:", error);
+            displayError("An error occurred while saving user details."); // Display a generic error message
+        
+        }
+        
+    });
+}
+    // Function to display the error message in the modal
+    function displayError(errorMessage) {
+    const errorBox = document.getElementById("errorBox");
+    errorBox.innerText = errorMessage;
+    errorBox.style.display = "block";
+}
+
+    // Disable the selected color in the color picker
+    const colorRadios = document.querySelectorAll("input[name='color']");
+    for (const radio of colorRadios) {
+        if (radio.value === color) {
+            radio.disabled = true;
+        }
+    }
+
+
+    // Close the modal dialog after saving
+    $("#userDetailsModal").modal("hide");
+}
+
+</script>
     <div class="container">
         <div class="card p-5">
             <div class="row">
@@ -218,60 +333,41 @@ include("header.php");
         </div>
     </div>
 	
-	
+	<div class="user-info" style="height: 40px">
+            <div class="avatar-container" >
+                <img id="userAvatar" src="" alt="" title="This is sample user">
+            </div>
+            
+        </div>
 	<table id="data_table" class="table table-striped table-bordered table-hover mt-5">
 		<thead>
 			<tr class="text-center">
-				<th>#</th>
-				<th contenteditable="true">App Status</th>
-                <th contenteditable="true">First Name</th>
-                <th contenteditable="true">Middle Name</th>
-                <th contenteditable="true">Last Name</th>
-                <th contenteditable="true">Jobtitle</th>
-				<th contenteditable="true">Jobtitle2</th>
-        	    <th contenteditable="true">Contact</th>
-        	    <th contenteditable="true">Contact2</th>
-        	    <th contenteditable="true">Address</th>
-        	    <th contenteditable="true">Email</th>
-        	    <th contenteditable="true">Passport</th>
-        	    <th contenteditable="true">Exp_years</th>
-        	    <th contenteditable="true">Eligibility</th>
-        	    <th contenteditable="true">Skype</th>
-				<th contenteditable="true">Date Encoded</th>
-        	    <th contenteditable="true">Recruiter</th>
-                <!-- for another add of column -->
-        	    <th contenteditable="true">test</th>
+			<th>#</th>
+            <?php
+            foreach ($column_names as $column_name) {
+                echo '<th contenteditable="true">' . $column_name . '</th>';
+            }
+            ?>
 			</tr>
 		</thead>
 		<tbody>
-			<?php 
-			$sql_query = "SELECT * FROM developers";
-			$resultset = mysqli_query($conn, $sql_query) or die("database error:". mysqli_error($conn));
-			while( $developer = mysqli_fetch_assoc($resultset) ) {
-			?>
-			
-			   <tr id="<?php echo $developer ['id']; ?>" style="height: 55px;">
-			   <td><?php echo $developer ['id']; ?></td>
-			   <td><?php echo $developer ['app_status']; ?></td>
-			   <td><?php echo $developer ['jobseeker_fname']; ?></td>
-			   <td><?php echo $developer ['jobseeker_mname']; ?></td>   
-			   <td><?php echo $developer ['jobseeker_lname']; ?></td>
-			   <td><?php echo $developer ['jobtitle']; ?></td>  
-			   <td><?php echo $developer ['jobtitle2']; ?></td>
-			   <td><?php echo $developer ['contact']; ?></td>
-			   <td><?php echo $developer ['contact2']; ?></td>
-			   <td><?php echo $developer ['address']; ?></td>   
-			   <td><?php echo $developer ['email']; ?></td>
-			   <td><?php echo $developer ['passport']; ?></td>   
-			   <td><?php echo $developer ['exp_years']; ?></td>   
-			   <td><?php echo $developer ['eligibility']; ?></td>   
-			   <td><?php echo $developer ['skype_id']; ?></td>   
-			   <td><?php echo $developer ['date_encoded']; ?></td>   
-			   <td><?php echo $developer ['recruiter']; ?></td>  
-               <!-- // for another add of column -->
-               <td><?php echo $developer ['testing']; ?></td>   
-			   </tr>
-			<?php } ?>
+        <?php 
+    $sql_query = "SELECT * FROM developers";
+    $resultset = mysqli_query($conn, $sql_query) or die("database error:". mysqli_error($conn));
+    $row_number = 1; // Initialize row number
+    while ($developer = mysqli_fetch_assoc($resultset)) {
+    ?>
+        <tr style="height: 55px;">
+            <td><?php echo $row_number++; ?></td> <!-- Display row number -->
+            <?php
+            foreach ($column_names as $column_name) {
+                if ($column_name !== 'id') { // Exclude the 'id' column
+                    echo '<td>' . $developer[$column_name] . '</td>';
+                }
+            }
+            ?>
+        </tr>
+    <?php } ?>
 		</tbody>
     </table>	
 	<form id="developerForm">
@@ -433,6 +529,7 @@ function insertColumnToDatabase(columnName) {
 //     xhr.send('columnName=' + encodeURIComponent(columnName));
 //   }
 </script>
+
 <style>
 .color-sample {
     display: inline-block;
