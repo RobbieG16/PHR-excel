@@ -1,31 +1,32 @@
 $(document).ready(function () {
-  $("#data_table").Tabledit({
-    deleteButton: false,
-    editButton: false,
-    columns: {
-      identifier: [0, "id"],
-      editable: [
-        [1, "app_status"],
-        [2, "jobseeker_fname"],
-        [3, "jobseeker_mname"],
-        [4, "jobseeker_lname"],
-        [5, "jobtitle"],
-        [6, "jobtitle2"],
-        [7, "contact"],
-        [8, "contact2"],
-        [9, "address"],
-        [10, "email"],
-        [11, "passport"],
-        [12, "exp_years"],
-        [13, "eligibility"],
-        [14, "skype_id"],
-        [15, "date_encoded"],
-        [16, "recruiter"],
-        // for another add of column
-        [17, "testing"],
-      ],
+  // Fetch column names from PHP using AJAX
+  $.ajax({
+    url: "get_column_names.php",
+    method: "GET",
+    success: function (response) {
+      var editableColumns = JSON.parse(response);
+
+      var editableArray = [];
+      for (var i = 1; i < editableColumns.length; i++) {
+        editableArray.push([i, editableColumns[i]]);
+      }
+
+      console.log("Editable Columns:", editableArray);
+
+      $("#data_table").Tabledit({
+        deleteButton: false,
+        editButton: false,
+        columns: {
+          identifier: [0, "id"],
+          editable: editableArray,
+          editable: editableColumns.map((col, index) => [index + 1, col]),
+        },
+        hideIdentifier: false,
+        url: "live_edit.php",
+      });
     },
-    hideIdentifier: false,
-    url: "live_edit.php",
+    error: function (xhr, status, error) {
+      console.error("AJAX error:", error);
+    }
   });
 });
