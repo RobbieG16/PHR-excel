@@ -1,38 +1,27 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "excel";
+include_once("db_connect.php");
 
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Fetch the updated header value and column index from the AJAX request
+// Get the updated header value and column index from the AJAX request
 $newHeaderValue = $_POST['newHeaderValue'];
 $columnHeaderIndex = $_POST['columnHeaderIndex'];
 
-// Assuming your table name is 'developers'
-$tableName = "developers";
+// Fetch the existing column names from the 'developers' table
+$columns_query = "SHOW COLUMNS FROM developers";
+$columns_result = mysqli_query($conn, $columns_query) or die("database error: " . mysqli_error($conn));
 
-// Assuming you have an array of existing column names in the same order as they appear in the table
-$existingColumnNames = [
-    "id",
-    "app_status",
-    "jobseeker_fname",
-    // ... other column names ...
-];
+$existingColumnNames = array();
+while ($column = mysqli_fetch_assoc($columns_result)) {
+    if ($column['Field'] !== 'id') { // Exclude the 'id' column
+        $existingColumnNames[] = $column['Field'];
+    }
+}
 
-// Assuming you want to update the nth column header (column index starts from 0)
+// Check if the column index is valid
 if ($columnHeaderIndex >= 0 && $columnHeaderIndex < count($existingColumnNames)) {
     $oldColumnName = $existingColumnNames[$columnHeaderIndex];
 
-    // Use the ALTER TABLE query to rename the column
-    $alterQuery = "ALTER TABLE $tableName CHANGE $oldColumnName $newHeaderValue VARCHAR(255)";
+    // Update the column name in the database
+    $alterQuery = "ALTER TABLE developers CHANGE $oldColumnName $newHeaderValue VARCHAR(255)";
     
     if ($conn->query($alterQuery) === TRUE) {
         echo "Header updated successfully.";

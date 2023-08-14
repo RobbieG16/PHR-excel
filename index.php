@@ -6,6 +6,39 @@
     <title>PHR - Excel</title>
     <script src="custom_table_edit.js"></script>
     <script>
+        $(document).ready(function () {
+            // Fetch column names from get_column_names.php using AJAX
+            $.ajax({
+                url: "get_column_names.php",
+                method: "GET",
+                success: function (response) {
+                    var editableColumns = JSON.parse(response);
+
+                    var editableArray = [];
+                    for (var i = 0; i < editableColumns.length; i++) {
+                        editableArray.push([i + 1, editableColumns[i]]);
+                    }
+
+                    console.log("Editable Columns:", editableArray);
+
+                    $("#data_table").Tabledit({
+                        deleteButton: false,
+                        editButton: false,
+                        columns: {
+                            identifier: [0, "id"],
+                            editable: editableArray,
+                        },
+                        hideIdentifier: false,
+                        url: "live_edit.php",
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error("AJAX error:", error);
+                }
+            });
+        });
+    </script>
+    <script>
     // Function to update the table content with fetched data
     function updateTable(data) {
         var tableBody = document.getElementById("data_table").getElementsByTagName("tbody")[0];
@@ -298,10 +331,10 @@ function saveUserToDatabase(username, avatar, color) {
 
     // Send a POST request to the PHP file on the server
     $.ajax({
-        type: "POST",
+        method: "POST",
         url: "save_user_details.php", // Replace with the actual URL to your PHP file
-        data: userDetails,
         dataType: "json",
+        data: userDetails,
         success: function(response) {
             // Check the response from the server for any errors or success messages
             if (response.success) {
@@ -392,10 +425,10 @@ function saveUserToDatabase(username, avatar, color) {
 	<table id="data_table" class="table table-striped table-bordered table-hover mt-5">
 		<thead>
 			<tr class="text-center">
-			<th>#</th>
+			<th style="background-color: #00FFFF;">#</th>
             <?php
             foreach ($column_names as $column_name) {
-                echo '<th contenteditable="true">' . $column_name . '</th>';
+                echo '<th contenteditable="true" style="background-color: #00000;">' . $column_name . '</th>';
             }
             ?>
 			</tr>
@@ -506,12 +539,12 @@ function insertColumnToDatabase(columnName) {
             var table = $('#data_table');
 
             // Add the new header to the table header row
-            var th = $('<th>').text(columnName);
+            var th = $('<th>').text(columnName).attr('contenteditable', 'true'); // Make the header editable
             table.find('thead tr').append(th);
 
             // Add a cell for the new column in each row
             table.find('tbody tr').each(function () {
-                $(this).append('<td></td>');
+                $(this).append('<td contenteditable="true"></td>');
             });
 
             // Show the response from the server (success message or error)

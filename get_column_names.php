@@ -11,6 +11,9 @@ while ($column = mysqli_fetch_assoc($columns_result)) {
         $column_names[] = $column['Field'];
     }
 }
+ // Convert column names array to JSON for JavaScript use
+ $column_names_json = json_encode($column_names);
+
 
 echo json_encode($column_names);
 ?>
