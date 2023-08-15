@@ -1,5 +1,5 @@
 <?php
-// Include necessary files and establish database connection
+header("Content-Type: application/json");
 
 // Query the database to fetch the updated data
 $query = "SELECT * FROM developers";

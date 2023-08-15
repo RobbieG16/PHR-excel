@@ -1,3 +1,8 @@
+<?php
+// Include this at the top of your PHP file
+session_start();
+$userLoggedIn = isset($_SESSION["userLoggedIn"]) && $_SESSION["userLoggedIn"] === true;
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,39 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PHR - Excel</title>
     <script src="custom_table_edit.js"></script>
-    <script>
-        $(document).ready(function () {
-            // Fetch column names from get_column_names.php using AJAX
-            $.ajax({
-                url: "get_column_names.php",
-                method: "GET",
-                success: function (response) {
-                    var editableColumns = JSON.parse(response);
-
-                    var editableArray = [];
-                    for (var i = 0; i < editableColumns.length; i++) {
-                        editableArray.push([i + 1, editableColumns[i]]);
-                    }
-
-                    console.log("Editable Columns:", editableArray);
-
-                    $("#data_table").Tabledit({
-                        deleteButton: false,
-                        editButton: false,
-                        columns: {
-                            identifier: [0, "id"],
-                            editable: editableArray,
-                        },
-                        hideIdentifier: false,
-                        url: "live_edit.php",
-                    });
-                },
-                error: function (xhr, status, error) {
-                    console.error("AJAX error:", error);
-                }
-            });
-        });
-    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script>
     // Function to update the table content with fetched data
     function updateTable(data) {
@@ -52,6 +25,7 @@
             for (var j = 0; j < data[i].length; j++) {
                 var cell = row.insertCell(j);
                 cell.innerHTML = data[i][j];
+                
             }
         }
     }
@@ -77,7 +51,33 @@
     // Call the fetchUpdatedData function at the specified interval
     setInterval(fetchUpdatedData, refreshInterval);
 </script>
+<script>
+function login() {
+    var username = document.getElementById("loginUsername").value;
+    var password = document.getElementById("loginPassword").value;
+
+    // Send login data to the server
+    $.ajax({
+        type: "POST",
+        url: "login.php", // Replace with the actual URL to your PHP login script
+        data: { username: username, password: password },
+        success: function(response) {
+            if (response.success) {
+                // User successfully logged in, reload the page
+                location.reload();
+            } else {
+                // Show an error message
+                document.getElementById("loginError").innerText = response.message;
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Login error:", error);
+        }
+    });
+}
+</script>
 </head>
+
 <body>
 <div id="updates"></div>
 <script>
@@ -108,16 +108,16 @@ while ($column = mysqli_fetch_assoc($columns_result)) {
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
 <div class="container-fluid home m-5">
     <!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+<!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
   Launch demo modal
-</button>
+</button> -->
 
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+        <h1 class="modal-title fs-5" id="exampleModalLabel">USER</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -273,31 +273,40 @@ while ($column = mysqli_fetch_assoc($columns_result)) {
     </div>
   </div>
 </div>
-<script>    // Disable the selected avatar and color in the color picker and avatar options
-function disableSelectedOptions() {
-    const selectedAvatar = selectedUserDetails.avatar;
-    const selectedColor = selectedUserDetails.color;
+<script>
+    // Define selectedUserDetails with actual values
+    const selectedUserDetails = {
+        avatar: "Avatar 1", // Fetch the current avatar value here
+        color: "#FF0000"   // Fetch the current color value here
+    };
 
-    const avatarRadios = document.querySelectorAll("input[name='avatar']");
-    for (const radio of avatarRadios) {
-        if (radio.value === selectedAvatar) {
-            radio.disabled = true;
+    // Disable the selected avatar and color in the color picker and avatar options
+    function disableSelectedOptions() {
+        const selectedAvatar = selectedUserDetails.avatar;
+        const selectedColor = selectedUserDetails.color;
+
+        const avatarRadios = document.querySelectorAll("input[name='avatar']");
+        for (const radio of avatarRadios) {
+            if (radio.value === selectedAvatar) {
+                radio.disabled = true;
+            }
+        }
+
+        const colorRadios = document.querySelectorAll("input[name='color']");
+        for (const radio of colorRadios) {
+            if (radio.value === selectedColor) {
+                radio.disabled = true;
+            }
         }
     }
 
-    const colorRadios = document.querySelectorAll("input[name='color']");
-    for (const radio of colorRadios) {
-        if (radio.value === selectedColor) {
-            radio.disabled = true;
-        }
-    }
-
-}
-$('#myModal').on('shown.bs.modal', function () {
-    disableSelectedOptions();
-});
-
+    // Attach the disableSelectedOptions function to the modal's shown.bs.modal event
+    $('#myModal').on('shown.bs.modal', function () {
+        disableSelectedOptions();
+    });
 </script>
+
+
 <script>
 function saveUserDetails() {
     const username = document.getElementById("username").value;
@@ -412,6 +421,12 @@ function saveUserToDatabase(username, avatar, color) {
                         <button type="submit" class="btn btn-primary"><i class="bi bi-download"></i> Export</button>
                     </form>
                 </div>
+                <br><br></br>
+                <form>
+                
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+  Launch demo modal
+</button></form>
             </div>
         </div>
     </div>
@@ -422,6 +437,48 @@ function saveUserToDatabase(username, avatar, color) {
             </div>
             
         </div>
+    <div id="loginModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">>
+    <!-- <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"> -->
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Login</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <!-- <span aria-hidden="true">&times;</span> -->
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="loginError" class="alert alert-danger" style="display: none;"></div>
+                <form>
+                    <div class="form-group">
+                        <label for="loginUsername">Username:</label>
+                        <input type="text" class="form-control" id="loginUsername" placeholder="Enter your username">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password:</label>
+                        <input type="password" class="form-control" id="loginPassword" placeholder="Enter your password">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="login()">Login</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Add a button to trigger the login modal -->
+<div class="user-info" style="height: 40px">
+    <?php if (!$userLoggedIn) { ?>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
+        Login
+        </button>
+
+    <?php } else { ?>
+        <div class="avatar-container">
+            <img id="userAvatar" src="" alt="" title="This is sample user">
+        </div>
+    <?php } ?>
+</div>
 	<table id="data_table" class="table table-striped table-bordered table-hover mt-5">
 		<thead>
 			<tr class="text-center">
@@ -515,6 +572,35 @@ $(document).ready(function () {
     });
 });
 
+$(document).ready(function() {
+    // Fetch user avatars from the server
+    $.ajax({
+        type: "GET",
+        url: "get_all_user_avatars.php", // Replace with the actual server-side endpoint
+        success: function(response) {
+            console.log(response);
+            const avatarContainer = document.querySelector('.avatar-container');
+
+            // Loop through the response to create and add avatar images
+            response.forEach(user => {
+                const avatarImage = document.createElement('img');
+                avatarImage.src = 'avatars/' + user.avatar + '.jpg';
+                avatarImage.alt = 'User Avatar';
+                avatarImage.style.maxWidth = '40px';
+                avatarImage.style.maxHeight = '40px';
+                avatarImage.style.margin = '2px';
+                avatarImage.style.border = '1px solid #000';
+                avatarContainer.appendChild(avatarImage);
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error("Error fetching user avatars:", error);
+        }
+    });
+});
+
+
+
 </script>
 
 <script>
@@ -571,7 +657,21 @@ function insertColumnToDatabase(columnName) {
 <script type="text/javascript" src="custom_table_edit.js"></script>
 <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
 <?php include('footer.php');?>
- 
+<script>
+    // Use vanilla JavaScript to show the login modal on page load
+    document.addEventListener("DOMContentLoaded", function() {
+        var loginModal = new bootstrap.Modal(document.getElementById("loginModal"));
+        loginModal.show();
+    });
+</script>
+<script>
+    const ws = new WebSocket("ws://localhost: 5500");
+
+    ws.addEventListener("open". () => {
+        console.log("We are connected!");
+    });
+
+</script>
 </body>
 </html>
 
