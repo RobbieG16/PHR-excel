@@ -51,34 +51,35 @@ $userLoggedIn = isset($_SESSION["userLoggedIn"]) && $_SESSION["userLoggedIn"] ==
     // Call the fetchUpdatedData function at the specified interval
     setInterval(fetchUpdatedData, refreshInterval);
 </script>
-<script>
-function login() {
-    var username = document.getElementById("loginUsername").value;
-    var password = document.getElementById("loginPassword").value;
-
-    // Send login data to the server
-    $.ajax({
-        type: "POST",
-        url: "login.php", // Replace with the actual URL to your PHP login script
-        data: { username: username, password: password },
-        success: function(response) {
-            if (response.success) {
-                // User successfully logged in, reload the page
-                location.reload();
-            } else {
-                // Show an error message
-                document.getElementById("loginError").innerText = response.message;
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error("Login error:", error);
+<title>Logout Button Example</title>
+    <style>
+        .user-info {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            height: 40px;
         }
-    });
-}
-</script>
+    </style>
 </head>
 
 <body>
+    <div class="user-info" style="height: 40px">
+    <!-- Display the assigned avatar here -->
+    <img src="<?php echo $assignedAvatar; ?>" alt="User Avatar" style="max-width: 40px; max-height: 40px;">
+    </div>
+    <?php
+        // Check if the user is logged in
+        if (!isset($_SESSION["username"])) {
+            header("Location: login.php");
+            exit;
+        }
+
+        $username = $_SESSION["username"];
+        $assignedAvatar = $_SESSION["avatar"];
+        $assignedColor = $_SESSION["color"];
+        // $username = $_SESSION["username"];
+    ?>
+    <h1>Welcome, <?php echo $username ?></h1>
 <div id="updates"></div>
 <script>
         const updatesDiv = document.getElementById("updates");
@@ -107,10 +108,6 @@ while ($column = mysqli_fetch_assoc($columns_result)) {
 <script type="text/javascript" src="dist/jquery.tabledit.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
 <div class="container-fluid home m-5">
-    <!-- Button trigger modal -->
-<!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-  Launch demo modal
-</button> -->
 
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -121,7 +118,6 @@ while ($column = mysqli_fetch_assoc($columns_result)) {
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <!-- User details form -->
         <form id="userDetailsForm">
                             <div class="form-group">
                                 <label for="username">Username:</label>
@@ -130,7 +126,6 @@ while ($column = mysqli_fetch_assoc($columns_result)) {
                             <div class="form-group">
                                 <label for="avatar">Avatar:</label>
                                 <div class="avatar-options">
-                                    <!-- Add image options for avatar selection -->
                                     <label>
                                         <input type="radio" name="avatar" value="1">
                                         <img src="avatars/1.jpg" alt="Avatar 1" style="max-width: 40px; max-height: 40px;">
@@ -195,13 +190,11 @@ while ($column = mysqli_fetch_assoc($columns_result)) {
                                         <input type="radio" name="avatar" value="16">
                                         <img src="avatars/16.jpg" alt="Avatar 16"  style="max-width: 40px; max-height: 40px;">
                                     </label>
-                                    <!-- Add more image options as needed -->
                                 </div>
                             </div>
                             <div class="form-group">
                             <label for="color">Choose Color:</label>
                                 <div class="color-picker">
-                                    <!-- Add 15 color options in the modal color picker -->
                                     <label>
                                         <input type="radio" name="color" value="#FF0000">
                                         <span class="color-sample" style="background-color: #FF0000;"></span>
@@ -214,7 +207,6 @@ while ($column = mysqli_fetch_assoc($columns_result)) {
                             <input type="radio" name="color" value="#0000FF">
                             <span class="color-sample" style="background-color: #0000FF;"></span>
                         </label>
-                        <!-- Add more color options as needed -->
                         <label>
                             <input type="radio" name="color" value="#FFFF00">
                             <span class="color-sample" style="background-color: #FFFF00;"></span>
@@ -261,12 +253,11 @@ while ($column = mysqli_fetch_assoc($columns_result)) {
                         </label>
                                 </div>
                             </div>
-                            <div class="alert alert-danger" id="errorBox" style="display: none;"></div>
-
+                            <div class="alert alert-danger" id="messageBox" style="display: none;"></div>
                         </form>
-                    
-      </div>
+                        </div>
       <div class="modal-footer">
+      
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         <button type="button" class="btn btn-primary" onclick="saveUserDetails()">Save changes</button>
       </div>
@@ -308,28 +299,15 @@ while ($column = mysqli_fetch_assoc($columns_result)) {
 
 
 <script>
-function saveUserDetails() {
-    const username = document.getElementById("username").value;
-    const avatar = document.querySelector("input[name='avatar']:checked").value;
-    const color = document.querySelector("input[name='color']:checked").value;
-
-    // Update the focus color of editable cells
-    const editableCells = document.querySelectorAll("td[contenteditable='true']");
-    for (const cell of editableCells) {
-        cell.style.outlineColor = color;
+function displayMessage(message) {
+    const messageBox = document.getElementById("messageBox");
+    if (messageBox){
+    messageBox.innerText = message;
+    messageBox.style.display = "block";
     }
+}
 
-    // Display selected avatar and color in the user-info section
-    const userAvatar = document.getElementById("userAvatar");
-    userAvatar.src = "avatars/" + avatar + ".jpg"; // Set the source of the selected avatar image
-    userAvatar.style.border = "3px solid " + color; // Set the border color of the user avatar    
-
-    // AJAX request to send user details to the server
-    saveUserToDatabase(username, avatar, color);
-
-
-
-    // Function to send user details to the backend for saving in the database
+// Function to send user details to the backend for saving in the database
 function saveUserToDatabase(username, avatar, color) {
     // Create an object to hold the user details
     const userDetails = {
@@ -347,44 +325,116 @@ function saveUserToDatabase(username, avatar, color) {
         success: function(response) {
             // Check the response from the server for any errors or success messages
             if (response.success) {
-                // The user details were saved successfully
                 console.log("User details saved in the database.");
                 $("#userDetailsModal").modal("hide");
             } else {
-                // There was an error saving the user details
                 console.error("Error saving user details:", response.error);
-                // Display the error as a pop-up using the built-in alert function
-                alert("Error: " + response.error);
+                displayMessage("Error: " + response.error);
             }
         },
         error: function(xhr, status, error) {
             // Handle any errors that occur during the AJAX request
             console.error("AJAX error:", error);
-            displayError("An error occurred while saving user details."); // Display a generic error message
-        
+            displayMessage("An error occurred while saving user details.");
         }
-        
     });
 }
-    // Function to display the error message in the modal
-    function displayError(errorMessage) {
-    const errorBox = document.getElementById("errorBox");
-    errorBox.innerText = errorMessage;
-    errorBox.style.display = "block";
-}
 
-    // Disable the selected color in the color picker
-    const colorRadios = document.querySelectorAll("input[name='color']");
-    for (const radio of colorRadios) {
-        if (radio.value === color) {
-            radio.disabled = true;
-        }
+// Function to save user details and update UI elements
+function saveUserDetails() {
+    const username = document.getElementById("username").value;
+    const avatar = document.querySelector("input[name='avatar']:checked").value;
+    const color = document.querySelector("input[name='color']:checked").value;
+
+    // Update the focus color of editable cells
+    const editableCells = document.querySelectorAll("td[contenteditable='true']");
+    for (const cell of editableCells) {
+        cell.style.outlineColor = color;
     }
 
+    // Display selected avatar and color in the user-info section
+    const userAvatar = document.getElementById("userAvatar");
+    userAvatar.src = "avatars/" + avatar + ".jpg";
+    userAvatar.style.border = "3px solid " + color;
+
+    // Send user details to the server for saving
+    saveUserToDatabase(username, avatar, color);
 
     // Close the modal dialog after saving
     $("#userDetailsModal").modal("hide");
+
+    // Call a function to handle the user login process
+    login(username, avatar, color);
+
 }
+
+function login() {
+    var username = document.getElementById("loginUsername").value;
+    var password = document.getElementById("loginPassword").value;
+
+    // Send login data to the server
+    $.ajax({
+        method: "POST",
+        url: "login.php", // Replace with the actual URL to your PHP login script
+        data: { username: username, password: password },
+        success: function(response) {
+            if (response.success) {
+                
+            document.getElementById("loginError").innerText = "";
+
+                
+                document.getElementById("loginSuccessMessage").innerText = "Login successful! Reloading the page...";
+        
+                
+                setTimeout(function() {
+            location.reload();
+        }, 1500);
+            } else {
+            
+                document.getElementById("loginError").innerText = response.message;
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Login error:", error);
+            displayMessage("An error occurred while saving user details.");
+            
+        }
+    });
+}
+
+
+function logout() {
+    // Send a request to the server to destroy the user's session
+    $.ajax({
+        method: "POST",
+        url: "logout.php", // Replace with the actual URL to your PHP file for logout
+        dataType: "json",
+        success: function(response) {
+            if (response.success) {
+                // Logout successful
+                console.log("User logged out.");
+                // Optionally, redirect the user to the login page
+                window.location.href = "login1.php";
+            } else {
+                console.error("Logout error:", response.error);
+                displayError("Logout failed: " + response.error);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("AJAX error:", error);
+            displayError("An error occurred while logging out.");
+        }
+    });
+}
+
+// // Disable the selected color in the color picker
+// const colorRadios = document.querySelectorAll("input[name='color']");
+// for (const radio of colorRadios) {
+//     if (radio.value === color) {
+//         radio.disabled = true;
+//     }
+// }
+
 
 </script>
     <div class="container">
@@ -410,7 +460,7 @@ function saveUserToDatabase(username, avatar, color) {
                     </form>
                 </div>
                 
-                <div class="col-3">
+                <!-- <div class="col-3">
                     <form action="reset.php" method="post" class="mt-3">
                         <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-clockwise"></i> Reset Table</button>
                     </form>
@@ -420,13 +470,13 @@ function saveUserToDatabase(username, avatar, color) {
                     <form action="reset.php" method="post" class="mt-3">
                         <button type="submit" class="btn btn-primary"><i class="bi bi-download"></i> Export</button>
                     </form>
-                </div>
+                </div> -->
                 <br><br></br>
-                <form>
-                
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-  Launch demo modal
-</button></form>
+                <div class ="col-3">
+                    <form>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">User modal</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -437,8 +487,8 @@ function saveUserToDatabase(username, avatar, color) {
             </div>
             
         </div>
-    <div id="loginModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">>
-    <!-- <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"> -->
+    <!-- <div id="loginModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">> -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -463,14 +513,16 @@ function saveUserToDatabase(username, avatar, color) {
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" onclick="login()">Login</button>
             </div>
+            <div id="loginError" class="error-message" style="display: none;"></div>
+            <div id="loginSuccessMessage" class="success-message"></div>
         </div>
     </div>
 </div>
 <!-- Add a button to trigger the login modal -->
 <div class="user-info" style="height: 40px">
     <?php if (!$userLoggedIn) { ?>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
-        Login
+        <button type="button" class="btn btn-primary" onclick="logout()">
+        Logout
         </button>
 
     <?php } else { ?>
@@ -598,9 +650,6 @@ $(document).ready(function() {
         }
     });
 });
-
-
-
 </script>
 
 <script>
@@ -658,10 +707,10 @@ function insertColumnToDatabase(columnName) {
 <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
 <?php include('footer.php');?>
 <script>
-    // Use vanilla JavaScript to show the login modal on page load
+    // Use vanilla JavaScript to show the user modal on page load
     document.addEventListener("DOMContentLoaded", function() {
-        var loginModal = new bootstrap.Modal(document.getElementById("loginModal"));
-        loginModal.show();
+        var exampleModal = new bootstrap.Modal(document.getElementById("exampleModal"));
+        exampleModal.show();
     });
 </script>
 <script>
@@ -674,6 +723,3 @@ function insertColumnToDatabase(columnName) {
 </script>
 </body>
 </html>
-
-
-                                                                                                       

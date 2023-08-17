@@ -1,27 +1,98 @@
 <?php
-// Replace with your actual database connection code
-include_once("db_connect.php");
+session_start();
+header("Content-Type: application/json");
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+include_once("db_connect.php"); // Include your database connection script
+
+
+
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+// Process login
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = $_POST["username"];
     $password = $_POST["password"];
+    
+    $sql = "SELECT * FROM login WHERE username = '$username' AND password = '$password'";
+    $result = mysqli_query($conn, $sql);
 
-    // Replace with your actual SQL query to check user credentials
-    $query = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
-    $result = mysqli_query($conn, $query);
+    // Check if the user exists in the database
+    $loginQuery = "SELECT * FROM login WHERE username = '$username' AND password = '$password'";
+    $result = mysqli_query($conn, $loginQuery);
 
-    if ($result && mysqli_num_rows($result) == 1) {
-        // User is authenticated, set a session variable to indicate login status
-        session_start();
-        $_SESSION["userLoggedIn"] = true;
+    
+    if (mysqli_num_rows($result) === 1) {
 
-        // Return success response
-        $response = array("success" => true);
-        echo json_encode($response);
+        // User found, update logged_in status to true and set session variable
+        $updateQuery = "UPDATE login SET logged_in = 1 WHERE username = '$username'";
+        mysqli_query($conn, $updateQuery);
+        
+        // Get available avatar and color from the database
+        $availableDataQuery = "SELECT * FROM avatars_colors WHERE is_available = 1 LIMIT 1";
+        $availableDataResult = mysqli_query($conn, $availableDataQuery);
+            
+        $_SESSION["username"] = $username;
+        // echo "Login successful!";
+        header("Location: index.php");
+        exit;
     } else {
-        // Return error response
-        $response = array("success" => false, "message" => "Invalid username or password.");
-        echo json_encode($response);
+        // echo "Login failed. Invalid username or password.";
+        echo "Login successful!";
+        header("Location: login1.php");
+        exit;
     }
 }
 ?>
+<!--
+session_start();
+header("Content-Type: application/json");
+
+include_once("db_connect.php"); // Include your database connection script
+
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+// Process login
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $username = $_POST["username"];
+    $password = $_POST["password"];
+    
+    $sql = "SELECT * FROM login WHERE username = '$username' AND password = '$password'";
+    $result = mysqli_query($conn, $sql);
+    
+    if (mysqli_num_rows($result) === 1) {
+        // Get available avatar and color from the database
+        $availableDataQuery = "SELECT * FROM avatars_colors WHERE is_available = 1 LIMIT 1";
+        $availableDataResult = mysqli_query($conn, $availableDataQuery);
+
+        if (mysqli_num_rows($availableDataResult) === 1) {
+            $row = mysqli_fetch_assoc($availableDataResult);
+
+            // Assign avatar and color to the user
+            $selectedAvatar = $row["avatar"];
+            $selectedColor = $row["color"];
+
+            // Store user data in session
+            $_SESSION["username"] = $username;
+            $_SESSION["avatar"] = $selectedAvatar;
+            $_SESSION["color"] = $selectedColor;
+
+            // Mark the selected avatar and color as unavailable
+            $selectedId = $row["id"];
+            $markAsUnavailableQuery = "UPDATE avatars_colors SET is_available = 0 WHERE id = $selectedId";
+            mysqli_query($conn, $markAsUnavailableQuery);
+
+        echo "Login successful!";
+        header("Location: index.php");
+        exit;
+    } else {
+        echo "Login failed. Invalid username or password.";
+        // echo "Login successful!";
+        header("Location: login1.php");
+        exit;
+    }
+}};
+?> -->
