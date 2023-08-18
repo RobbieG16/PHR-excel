@@ -18,11 +18,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $sql = "SELECT * FROM login WHERE username = '$username' AND password = '$password'";
     $result = mysqli_query($conn, $sql);
 
-    // Check if the user exists in the database
-    $loginQuery = "SELECT * FROM login WHERE username = '$username' AND password = '$password'";
-    $result = mysqli_query($conn, $loginQuery);
-
-    
     if (mysqli_num_rows($result) === 1) {
 
         // User found, update logged_in status to true and set session variable
@@ -30,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         mysqli_query($conn, $updateQuery);
         
         // Get available avatar and color from the database
-        $availableDataQuery = "SELECT * FROM avatars_colors WHERE is_available = 1 LIMIT 1";
+        $availableDataQuery = "SELECT * FROM avatars WHERE is_available = 1 LIMIT 1";
         $availableDataResult = mysqli_query($conn, $availableDataQuery);
             
         $_SESSION["username"] = $username;

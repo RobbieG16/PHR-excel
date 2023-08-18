@@ -1,30 +1,58 @@
 <?php
-include_once("db_connect.php");
+// Set up your database connection
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "excel";
 
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+$conn = new mysqli($servername, $username, $password, $dbname);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
 
-$avatarDirectory = 'avatars/';
+$avatarDirectory = "avatars/";
 $files = scandir($avatarDirectory);
 
 foreach ($files as $file) {
-    if ($file !== "." && $file !== ".." && pathinfo($file, PATHINFO_EXTENSION) === "jpg") {
-        $insertQuery = "INSERT INTO avatars_colors (avatar) VALUES ('$file')";
-        $result = mysqli_query($conn, $insertQuery); // Execute the query
+    if ($file !== '.' && $file !== '..') {
+        $filePath = $avatarDirectory . $file;
 
-        if ($result) {
-            // Send a JSON response back to the client to indicate success
-            $response = array("success" => true);
-            echo json_encode($response);
+        //Insert the image information into the database
+        $sql = "INSERT INTO avatars (avatar) VALUES ('$filePath')";
+        if ($conn->query($sql) === TRUE) {
+            echo "Record inserted successfully: $filePath<br>";
         } else {
-            // Error inserting data, log the error
-            error_log("Error inserting data: " . mysqli_error($conn));
-            $response = array("success" => false, "error" => "Error inserting data.");
-            echo json_encode($response);
+            echo "Error inserting record: " . $conn->error . "<br>";
         }
     }
 }
 
-mysqli_close($conn);
+$colors = array(
+    "#FF0000",
+    "#00FF00",
+    "#0000FF",
+    "#FFFF00",
+    "#FF00FF",
+    "#00FFFF",
+    "#FFA500",
+    "#800080",
+    "#008000",
+    "#800000",
+    "#008080",
+    "#000080",
+    "#FFC0CB",
+    "#FFD700"
+);
+
+foreach ($colors as $colorValue) {
+    $sql = "INSERT INTO avatars (color) VALUES ('$colorValue')";
+    if ($conn->query($sql) === TRUE) {
+        echo "Color inserted successfully: $colorValue<br>";
+    } else {
+        echo "Error inserting color: " . $conn->error . "<br>";
+    }
+}
+
+
+$conn->close();
 ?>

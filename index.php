@@ -51,19 +51,26 @@ $userLoggedIn = isset($_SESSION["userLoggedIn"]) && $_SESSION["userLoggedIn"] ==
     // Call the fetchUpdatedData function at the specified interval
     setInterval(fetchUpdatedData, refreshInterval);
 </script>
-<title>Logout Button Example</title>
+
     <style>
-        .user-info {
+        .logout {
             position: absolute;
             top: 10px;
             right: 10px;
             height: 40px;
         }
+        .user-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            height: 40px;
+        }
     </style>
+    
 </head>
 
 <body>
-    <div class="user-info" style="height: 40px">
+    <div class="user-info">
     <!-- Display the assigned avatar here -->
     <img src="<?php echo $assignedAvatar; ?>" alt="User Avatar" style="max-width: 40px; max-height: 40px;">
     </div>
@@ -79,7 +86,8 @@ $userLoggedIn = isset($_SESSION["userLoggedIn"]) && $_SESSION["userLoggedIn"] ==
         $assignedColor = $_SESSION["color"];
         // $username = $_SESSION["username"];
     ?>
-    <h1>Welcome, <?php echo $username ?></h1>
+    <h1>Welcome, <?php echo $username, $assignedAvatar, $assignedColor?></h1>
+    
 <div id="updates"></div>
 <script>
         const updatesDiv = document.getElementById("updates");
@@ -90,6 +98,10 @@ $userLoggedIn = isset($_SESSION["userLoggedIn"]) && $_SESSION["userLoggedIn"] ==
             updatesDiv.innerHTML = `<p>New update: ${message.text}</p>` + updatesDiv.innerHTML;
         };
     </script>
+    <div class="user-info">
+    <!-- Display the assigned avatar here -->
+    <img src="<?php echo $assignedAvatar; ?>" alt="User Avatar" style="max-width: 40px; max-height: 40px;">
+    </div>
 <?php 
 include_once("db_connect.php");
 include("header.php"); 
@@ -121,7 +133,8 @@ while ($column = mysqli_fetch_assoc($columns_result)) {
         <form id="userDetailsForm">
                             <div class="form-group">
                                 <label for="username">Username:</label>
-                                <input type="text" class="form-control" id="username" placeholder="Enter your username">
+                                <input type="text" class="form-control" id="username" placeholder="Enter your username" value="<?php echo $username; ?>" readonly>
+
                             </div>
                             <div class="form-group">
                                 <label for="avatar">Avatar:</label>
@@ -259,7 +272,7 @@ while ($column = mysqli_fetch_assoc($columns_result)) {
       <div class="modal-footer">
       
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" onclick="saveUserDetails()">Save changes</button>
+        <button type="button" class="btn btn-primary" onclick="saveUserDetails()" data-bs-dismiss="modal">Save changes</button>
       </div>
     </div>
   </div>
@@ -307,6 +320,30 @@ function displayMessage(message) {
     }
 }
 
+// Function to save user details and update UI elements
+function saveUserDetails() {
+    const username = document.getElementById("username").value;
+    const avatar = document.querySelector("input[name='avatar']:checked").value;
+    const color = document.querySelector("input[name='color']:checked").value;
+
+    // Update the focus color of editable cells
+    const editableCells = document.querySelectorAll("td[contenteditable='true']");
+    for (const cell of editableCells) {
+        cell.style.outlineColor = color;
+    }
+
+    // Display selected avatar and color in the user-info section
+    const userAvatar = document.getElementById("userAvatar");
+    userAvatar.src = "avatars/" + avatar + ".jpg";
+    userAvatar.style.border = "3px solid " + color;
+
+    // Send user details to the server for saving
+    saveUserToDatabase(username, avatar, color);
+
+    // Close the modal dialog after saving
+    $("#userDetailsModal").modal("hide");
+}
+
 // Function to send user details to the backend for saving in the database
 function saveUserToDatabase(username, avatar, color) {
     // Create an object to hold the user details
@@ -340,67 +377,6 @@ function saveUserToDatabase(username, avatar, color) {
     });
 }
 
-// Function to save user details and update UI elements
-function saveUserDetails() {
-    const username = document.getElementById("username").value;
-    const avatar = document.querySelector("input[name='avatar']:checked").value;
-    const color = document.querySelector("input[name='color']:checked").value;
-
-    // Update the focus color of editable cells
-    const editableCells = document.querySelectorAll("td[contenteditable='true']");
-    for (const cell of editableCells) {
-        cell.style.outlineColor = color;
-    }
-
-    // Display selected avatar and color in the user-info section
-    const userAvatar = document.getElementById("userAvatar");
-    userAvatar.src = "avatars/" + avatar + ".jpg";
-    userAvatar.style.border = "3px solid " + color;
-
-    // Send user details to the server for saving
-    saveUserToDatabase(username, avatar, color);
-
-    // Close the modal dialog after saving
-    $("#userDetailsModal").modal("hide");
-
-    // Call a function to handle the user login process
-    login(username, avatar, color);
-
-}
-
-function login() {
-    var username = document.getElementById("loginUsername").value;
-    var password = document.getElementById("loginPassword").value;
-
-    // Send login data to the server
-    $.ajax({
-        method: "POST",
-        url: "login.php", // Replace with the actual URL to your PHP login script
-        data: { username: username, password: password },
-        success: function(response) {
-            if (response.success) {
-                
-            document.getElementById("loginError").innerText = "";
-
-                
-                document.getElementById("loginSuccessMessage").innerText = "Login successful! Reloading the page...";
-        
-                
-                setTimeout(function() {
-            location.reload();
-        }, 1500);
-            } else {
-            
-                document.getElementById("loginError").innerText = response.message;
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error("Login error:", error);
-            displayMessage("An error occurred while saving user details.");
-            
-        }
-    });
-}
 
 
 function logout() {
@@ -426,14 +402,6 @@ function logout() {
         }
     });
 }
-
-// // Disable the selected color in the color picker
-// const colorRadios = document.querySelectorAll("input[name='color']");
-// for (const radio of colorRadios) {
-//     if (radio.value === color) {
-//         radio.disabled = true;
-//     }
-// }
 
 
 </script>
@@ -519,7 +487,7 @@ function logout() {
     </div>
 </div>
 <!-- Add a button to trigger the login modal -->
-<div class="user-info" style="height: 40px">
+<div class="logout" style="height: 40px">
     <?php if (!$userLoggedIn) { ?>
         <button type="button" class="btn btn-primary" onclick="logout()">
         Logout
