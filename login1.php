@@ -15,4 +15,27 @@
         <button type="submit">Login</button>
     </form>
 </body>
+<script>
+
+    $("#loginForm").submit(function(event) {
+
+event.preventDefault(); // prevent normal submit
+
+// AJAX submit
+$.ajax({
+  url: "login.php",
+  data: {
+    username: $("#username").val(),
+    password: $("#password").val() 
+  },
+  success: function(response) {
+    if(response.success) {
+      window.location.href = "landing.php"; 
+    }
+  }
+});
+
+});
+
+</script>
 </html>

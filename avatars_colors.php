@@ -1,58 +1,44 @@
 <?php
-// Set up your database connection
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "excel";
 
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+// Define constants for the MySQL connection
+define('DB_HOST', 'localhost');
+define('DB_USERNAME', 'root');
+define('DB_PASSWORD', '');
+define('DB_DATABASE', 'excel');
+
+// Create a connection to the database
+$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE);
+if (!$conn) {
+  die('Could not connect to the database: ' . mysqli_connect_error());
 }
 
-$avatarDirectory = "avatars/";
-$files = scandir($avatarDirectory);
+// Path to local folder with images 
+$img_folder = "/avatars";
 
-foreach ($files as $file) {
-    if ($file !== '.' && $file !== '..') {
-        $filePath = $avatarDirectory . $file;
+// Array of colors
+$colors = array("#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF", "#FFA500", "#800080", "#008000", "#800000", "#008080", "#000080", "#FFC0CB", "#FFD700");
 
-        //Insert the image information into the database
-        $sql = "INSERT INTO avatars (avatar) VALUES ('$filePath')";
-        if ($conn->query($sql) === TRUE) {
-            echo "Record inserted successfully: $filePath<br>";
-        } else {
-            echo "Error inserting record: " . $conn->error . "<br>";
-        }
-    }
+// Loop through images in folder
+$images = scandir($img_folder);
+foreach ($images as $img) {
+
+  // Only process image files
+  if (preg_match('/\.(jpg|jpeg|png|gif)$/', $img)) {
+
+    // Read image file
+    $img_data = file_get_contents($img_folder . $img);
+
+    // Prepare statement
+    $stmt = mysqli_prepare($conn, "INSERT INTO users (avatar, color) VALUES (?, ?)");
+
+    // Bind parameters
+    mysqli_stmt_bind_param($stmt, "b", $img_data);
+
+    // Execute statement
+    mysqli_stmt_execute($stmt);
+  }
 }
 
-$colors = array(
-    "#FF0000",
-    "#00FF00",
-    "#0000FF",
-    "#FFFF00",
-    "#FF00FF",
-    "#00FFFF",
-    "#FFA500",
-    "#800080",
-    "#008000",
-    "#800000",
-    "#008080",
-    "#000080",
-    "#FFC0CB",
-    "#FFD700"
-);
-
-foreach ($colors as $colorValue) {
-    $sql = "INSERT INTO avatars (color) VALUES ('$colorValue')";
-    if ($conn->query($sql) === TRUE) {
-        echo "Color inserted successfully: $colorValue<br>";
-    } else {
-        echo "Error inserting color: " . $conn->error . "<br>";
-    }
-}
-
-
-$conn->close();
+// Close the database connection
+mysqli_close($conn);
 ?>

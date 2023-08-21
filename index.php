@@ -1,5 +1,4 @@
 <?php
-// Include this at the top of your PHP file
 session_start();
 $userLoggedIn = isset($_SESSION["userLoggedIn"]) && $_SESSION["userLoggedIn"] === true;
 ?>
@@ -71,11 +70,11 @@ $userLoggedIn = isset($_SESSION["userLoggedIn"]) && $_SESSION["userLoggedIn"] ==
 
 <body>
     <div class="user-info">
-    <!-- Display the assigned avatar here -->
+    
     <img src="<?php echo $assignedAvatar; ?>" alt="User Avatar" style="max-width: 40px; max-height: 40px;">
     </div>
     <?php
-        // Check if the user is logged in
+        
         if (!isset($_SESSION["username"])) {
             header("Location: login.php");
             exit;
@@ -99,7 +98,7 @@ $userLoggedIn = isset($_SESSION["userLoggedIn"]) && $_SESSION["userLoggedIn"] ==
         };
     </script>
     <div class="user-info">
-    <!-- Display the assigned avatar here -->
+    
     <img src="<?php echo $assignedAvatar; ?>" alt="User Avatar" style="max-width: 40px; max-height: 40px;">
     </div>
 <?php 
@@ -674,13 +673,13 @@ function insertColumnToDatabase(columnName) {
 <script type="text/javascript" src="custom_table_edit.js"></script>
 <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
 <?php include('footer.php');?>
-<script>
+<!-- <script>
     // Use vanilla JavaScript to show the user modal on page load
     document.addEventListener("DOMContentLoaded", function() {
         var exampleModal = new bootstrap.Modal(document.getElementById("exampleModal"));
         exampleModal.show();
     });
-</script>
+</script> -->
 <script>
     const ws = new WebSocket("ws://localhost: 5500");
 

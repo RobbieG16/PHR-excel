@@ -1,93 +1,49 @@
 <?php
 session_start();
-header("Content-Type: application/json");
 
-include_once("db_connect.php"); // Include your database connection script
+// Define constants for the database connection
+define('DB_HOST', 'localhost');
+define('DB_USERNAME', 'root');
+define('DB_PASSWORD', '');
+define('DB_DATABASE', 'excel');
 
+if (isset($_POST['username']) && isset($_POST['password'])) {
+  $username = $_POST['username'];
+  $password = $_POST['password'];
 
+  // Connect to the database
+  $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE);
+  if (!$conn) {
+    die('Could not connect to the database: ' . mysqli_connect_error());
+  }
 
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
-}
+  // Check if the username and password exist in the database
+  $query = mysqli_query($conn, "SELECT * FROM login WHERE username='$username' AND password='$password'");
+  if ($query) {
+    $row = mysqli_fetch_assoc($query);
 
-// Process login
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $username = $_POST["username"];
-    $password = $_POST["password"];
-    
-    $sql = "SELECT * FROM login WHERE username = '$username' AND password = '$password'";
-    $result = mysqli_query($conn, $sql);
+    if ($row) {
 
-    if (mysqli_num_rows($result) === 1) {
+      // User found, update logged_in status to true and set session variable
+      $updateQuery = "UPDATE login SET logged_in = 1 WHERE username = '$username'";
+      mysqli_query($conn, $updateQuery);
 
-        // User found, update logged_in status to true and set session variable
-        $updateQuery = "UPDATE login SET logged_in = 1 WHERE username = '$username'";
-        mysqli_query($conn, $updateQuery);
-        
-        // Get available avatar and color from the database
-        $availableDataQuery = "SELECT * FROM avatars WHERE is_available = 1 LIMIT 1";
-        $availableDataResult = mysqli_query($conn, $availableDataQuery);
-            
-        $_SESSION["username"] = $username;
-        // echo "Login successful!";
-        header("Location: index.php");
-        exit;
+      $_SESSION['logged_in'] = true;
+
+      // The username and password exist, so the user is logged in
+      $_SESSION['username'] = $username;
+      header("Location: landing.php");
     } else {
-        // echo "Login failed. Invalid username or password.";
-        echo "Login successful!";
-        header("Location: login1.php");
-        exit;
+      // The username and password do not exist, so the user is not logged in
+      echo "Invalid username or password.";
+      header("Location: login1.php");
     }
+  } else {
+    die('Error executing query: ' . mysqli_error($conn));
+  }
+
+  // Close the database connection
+  mysqli_close($conn);
 }
 ?>
-<!--
-session_start();
-header("Content-Type: application/json");
 
-include_once("db_connect.php"); // Include your database connection script
-
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
-}
-
-// Process login
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $username = $_POST["username"];
-    $password = $_POST["password"];
-    
-    $sql = "SELECT * FROM login WHERE username = '$username' AND password = '$password'";
-    $result = mysqli_query($conn, $sql);
-    
-    if (mysqli_num_rows($result) === 1) {
-        // Get available avatar and color from the database
-        $availableDataQuery = "SELECT * FROM avatars_colors WHERE is_available = 1 LIMIT 1";
-        $availableDataResult = mysqli_query($conn, $availableDataQuery);
-
-        if (mysqli_num_rows($availableDataResult) === 1) {
-            $row = mysqli_fetch_assoc($availableDataResult);
-
-            // Assign avatar and color to the user
-            $selectedAvatar = $row["avatar"];
-            $selectedColor = $row["color"];
-
-            // Store user data in session
-            $_SESSION["username"] = $username;
-            $_SESSION["avatar"] = $selectedAvatar;
-            $_SESSION["color"] = $selectedColor;
-
-            // Mark the selected avatar and color as unavailable
-            $selectedId = $row["id"];
-            $markAsUnavailableQuery = "UPDATE avatars_colors SET is_available = 0 WHERE id = $selectedId";
-            mysqli_query($conn, $markAsUnavailableQuery);
-
-        echo "Login successful!";
-        header("Location: index.php");
-        exit;
-    } else {
-        echo "Login failed. Invalid username or password.";
-        // echo "Login successful!";
-        header("Location: login1.php");
-        exit;
-    }
-}};
-?> -->
