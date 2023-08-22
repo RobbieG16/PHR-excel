@@ -13,11 +13,20 @@ if (isset($_SESSION["username"])) {
     $username = $_SESSION["username"];
 
     $updateQuery = "UPDATE login SET logged_in = 0 WHERE username = '$username'";
+    
+
     mysqli_query($conn, $updateQuery);
+    
 
     // Destroy the user's session to log them out
     session_unset();
     session_destroy();
+
+    // Perform the DELETE operation
+    $deleteQuery = "DELETE FROM users WHERE username = ?";
+    $stmt = $conn->prepare($deleteQuery);
+    $stmt->bind_param("s", $username);
+
 
     $response = array();
     $response['success'] = true;

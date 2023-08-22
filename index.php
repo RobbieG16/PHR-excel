@@ -69,10 +69,7 @@ $userLoggedIn = isset($_SESSION["userLoggedIn"]) && $_SESSION["userLoggedIn"] ==
 </head>
 
 <body>
-    <div class="user-info">
     
-    <img src="<?php echo $assignedAvatar; ?>" alt="User Avatar" style="max-width: 40px; max-height: 40px;">
-    </div>
     <?php
         
         if (!isset($_SESSION["username"])) {
@@ -81,26 +78,34 @@ $userLoggedIn = isset($_SESSION["userLoggedIn"]) && $_SESSION["userLoggedIn"] ==
         }
 
         $username = $_SESSION["username"];
-        $assignedAvatar = $_SESSION["avatar"];
-        $assignedColor = $_SESSION["color"];
+        // $assignedAvatar = $_SESSION["avatar"];
+        // $assignedColor = $_SESSION["color"];
         // $username = $_SESSION["username"];
     ?>
-    <h1>Welcome, <?php echo $username, $assignedAvatar, $assignedColor?></h1>
+    <h1>Welcome, <?php echo $username?></h1>
     
-<div id="updates"></div>
-<script>
-        const updatesDiv = document.getElementById("updates");
-        const eventSource = new EventSource("server_events.php");
+    <div class="user-info" style="height: 40px" >
+            <div class="avatar-container" style="display: inline-block;">
+                <img id="userAvatar" img src="<?php echo $assignedAvatar; ?>" alt="" title="<?php echo $_SESSION["username"];?>" style="max-width: 40px; max-height: 40px; border: 3px solid #FFFF00;">
+            </div>
+            
+        </div>
+    <?php
+         include_once("db_connect.php");
+            // Fetch all users' data from the database
+            $query = "SELECT avatar, color FROM users";
+            $result = mysqli_query($conn, $query);
 
-        eventSource.onmessage = function(event) {
-            const message = JSON.parse(event.data);
-            updatesDiv.innerHTML = `<p>New update: ${message.text}</p>` + updatesDiv.innerHTML;
-        };
-    </script>
-    <div class="user-info">
-    
-    <img src="<?php echo $assignedAvatar; ?>" alt="User Avatar" style="max-width: 40px; max-height: 40px;">
+            while ($row = mysqli_fetch_assoc($result)) {
+                $avatar = $row['avatar'];
+                $color = $row['color'];
+
+                // Generate the HTML and JavaScript for each user's avatar
+                echo '<img src="avatars/' . $avatar . '.jpg" alt="User Avatar" style="max-width: 40px; max-height: 40px; border: 3px solid ' . $color . ';">';
+            }
+    ?>
     </div>
+
 <?php 
 include_once("db_connect.php");
 include("header.php"); 
@@ -119,7 +124,7 @@ while ($column = mysqli_fetch_assoc($columns_result)) {
 <script type="text/javascript" src="dist/jquery.tabledit.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
 <div class="container-fluid home m-5">
-
+        
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -132,7 +137,7 @@ while ($column = mysqli_fetch_assoc($columns_result)) {
         <form id="userDetailsForm">
                             <div class="form-group">
                                 <label for="username">Username:</label>
-                                <input type="text" class="form-control" id="username" placeholder="Enter your username" value="<?php echo $username; ?>" readonly>
+                                <input type="text" class="form-control" id="username" placeholder="Enter your username" value="<?php echo $_SESSION["username"]; ?>" readonly>
 
                             </div>
                             <div class="form-group">
@@ -319,47 +324,38 @@ function displayMessage(message) {
     }
 }
 
-// Function to save user details and update UI elements
 function saveUserDetails() {
     const username = document.getElementById("username").value;
     const avatar = document.querySelector("input[name='avatar']:checked").value;
     const color = document.querySelector("input[name='color']:checked").value;
 
-    // Update the focus color of editable cells
     const editableCells = document.querySelectorAll("td[contenteditable='true']");
     for (const cell of editableCells) {
         cell.style.outlineColor = color;
     }
 
-    // Display selected avatar and color in the user-info section
     const userAvatar = document.getElementById("userAvatar");
     userAvatar.src = "avatars/" + avatar + ".jpg";
     userAvatar.style.border = "3px solid " + color;
 
-    // Send user details to the server for saving
     saveUserToDatabase(username, avatar, color);
 
-    // Close the modal dialog after saving
     $("#userDetailsModal").modal("hide");
 }
 
-// Function to send user details to the backend for saving in the database
 function saveUserToDatabase(username, avatar, color) {
-    // Create an object to hold the user details
     const userDetails = {
         username: username,
         avatar: avatar,
         color: color
     };
 
-    // Send a POST request to the PHP file on the server
     $.ajax({
         method: "POST",
-        url: "save_user_details.php", // Replace with the actual URL to your PHP file
+        url: "save_user_details.php", 
         dataType: "json",
         data: userDetails,
         success: function(response) {
-            // Check the response from the server for any errors or success messages
             if (response.success) {
                 console.log("User details saved in the database.");
                 $("#userDetailsModal").modal("hide");
@@ -369,7 +365,6 @@ function saveUserToDatabase(username, avatar, color) {
             }
         },
         error: function(xhr, status, error) {
-            // Handle any errors that occur during the AJAX request
             console.error("AJAX error:", error);
             displayMessage("An error occurred while saving user details.");
         }
@@ -379,16 +374,13 @@ function saveUserToDatabase(username, avatar, color) {
 
 
 function logout() {
-    // Send a request to the server to destroy the user's session
     $.ajax({
         method: "POST",
-        url: "logout.php", // Replace with the actual URL to your PHP file for logout
+        url: "logout.php",
         dataType: "json",
         success: function(response) {
             if (response.success) {
-                // Logout successful
                 console.log("User logged out.");
-                // Optionally, redirect the user to the login page
                 window.location.href = "login1.php";
             } else {
                 console.error("Logout error:", response.error);
@@ -448,12 +440,7 @@ function logout() {
         </div>
     </div>
 	
-	<div class="user-info" style="height: 40px">
-            <div class="avatar-container" >
-                <img id="userAvatar" src="" alt="" title="This is sample user">
-            </div>
-            
-        </div>
+	
     <!-- <div id="loginModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">> -->
     <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -489,13 +476,8 @@ function logout() {
 <div class="logout" style="height: 40px">
     <?php if (!$userLoggedIn) { ?>
         <button type="button" class="btn btn-primary" onclick="logout()">
-        Logout
+            Logout
         </button>
-
-    <?php } else { ?>
-        <div class="avatar-container">
-            <img id="userAvatar" src="" alt="" title="This is sample user">
-        </div>
     <?php } ?>
 </div>
 	<table id="data_table" class="table table-striped table-bordered table-hover mt-5">
