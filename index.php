@@ -14,13 +14,13 @@ $userLoggedIn = isset($_SESSION["userLoggedIn"]) && $_SESSION["userLoggedIn"] ==
     // Function to update the table content with fetched data
     function updateTable(data) {
         var tableBody = document.getElementById("data_table").getElementsByTagName("tbody")[0];
-        tableBody.innerHTML = ""; // Clear the existing table rows
+        tableBody.innerHTML = "";
 
-        // Iterate through the fetched data and create new table rows
+
         for (var i = 0; i < data.length; i++) {
             var row = tableBody.insertRow();
 
-            // Iterate through the columns in each row and add cells
+
             for (var j = 0; j < data[i].length; j++) {
                 var cell = row.insertCell(j);
                 cell.innerHTML = data[i][j];
@@ -29,14 +29,14 @@ $userLoggedIn = isset($_SESSION["userLoggedIn"]) && $_SESSION["userLoggedIn"] ==
         }
     }
 
-    // Function to fetch updated data from the server
+
     function fetchUpdatedData() {
         $.ajax({
             type: "GET",
-            url: "get_updated_data.php", // Replace with the actual URL to your PHP file
+            url: "get_updated_data.php",
             dataType: "json",
             success: function(response) {
-                updateTable(response); // Call the updateTable function with fetched data
+                updateTable(response);
             },
             error: function(xhr, status, error) {
                 console.error("Error fetching updated data:", error);
@@ -44,10 +44,10 @@ $userLoggedIn = isset($_SESSION["userLoggedIn"]) && $_SESSION["userLoggedIn"] ==
         });
     }
 
-    // Set the refresh interval in milliseconds (e.g., 5000ms for 5 seconds)
-    const refreshInterval = 5000; // 5 seconds
+    // Set the refresh interval
+    const refreshInterval = 5000;
 
-    // Call the fetchUpdatedData function at the specified interval
+
     setInterval(fetchUpdatedData, refreshInterval);
 </script>
 
@@ -78,9 +78,18 @@ $userLoggedIn = isset($_SESSION["userLoggedIn"]) && $_SESSION["userLoggedIn"] ==
         }
 
         $username = $_SESSION["username"];
+        
         // $assignedAvatar = $_SESSION["avatar"];
         // $assignedColor = $_SESSION["color"];
         // $username = $_SESSION["username"];
+        // Check if the user is coming from the landing page
+        // Check if the user exists in the users table
+// $userQuery = "SELECT * FROM users WHERE username = ?";
+// $stmtUser = $conn->prepare($userQuery);
+// $stmtUser->bind_param("s", $username);
+// $stmtUser->execute();
+// $userResult = $stmtUser->get_result();
+// $userExists = $userResult->num_rows > 0;
     ?>
     <h1>Welcome, <?php echo $username?></h1>
     
@@ -329,10 +338,10 @@ function saveUserDetails() {
     const avatar = document.querySelector("input[name='avatar']:checked").value;
     const color = document.querySelector("input[name='color']:checked").value;
 
-    const editableCells = document.querySelectorAll("td[contenteditable='true']");
-    for (const cell of editableCells) {
-        cell.style.outlineColor = color;
-    }
+    // const editableCells = document.querySelectorAll("td[contenteditable='true']");
+    // for (const cell of editableCells) {
+    //     cell.style.outlineColor = color;
+    // }
 
     const userAvatar = document.getElementById("userAvatar");
     userAvatar.src = "avatars/" + avatar + ".jpg";
@@ -341,6 +350,7 @@ function saveUserDetails() {
     saveUserToDatabase(username, avatar, color);
 
     $("#userDetailsModal").modal("hide");
+    location.reload();
 }
 
 function saveUserToDatabase(username, avatar, color) {
@@ -352,7 +362,7 @@ function saveUserToDatabase(username, avatar, color) {
 
     $.ajax({
         method: "POST",
-        url: "save_user_details.php", 
+        url: "save_user_details.php",
         dataType: "json",
         data: userDetails,
         success: function(response) {
@@ -499,10 +509,10 @@ function logout() {
     while ($developer = mysqli_fetch_assoc($resultset)) {
     ?>
         <tr style="height: 55px;">
-            <td><?php echo $row_number++; ?></td> <!-- Display row number -->
+            <td><?php echo $row_number++; ?></td>
             <?php
             foreach ($column_names as $column_name) {
-                if ($column_name !== 'id') { // Exclude the 'id' column
+                if ($column_name !== 'id') {
                     echo '<td>' . $developer[$column_name] . '</td>';
                 }
             }
@@ -510,7 +520,7 @@ function logout() {
         </tr>
     <?php } ?>
 		</tbody>
-    </table>	
+        </table>
 	<form id="developerForm">
         <!-- Input fields for developer data -->
         <!-- Add appropriate input fields for app_status, jobseeker_fname, etc. -->
@@ -574,15 +584,15 @@ $(document).ready(function () {
 });
 
 $(document).ready(function() {
-    // Fetch user avatars from the server
+    
     $.ajax({
         type: "GET",
-        url: "get_all_user_avatars.php", // Replace with the actual server-side endpoint
+        url: "get_all_user_avatars.php",
         success: function(response) {
             console.log(response);
             const avatarContainer = document.querySelector('.avatar-container');
 
-            // Loop through the response to create and add avatar images
+            
             response.forEach(user => {
                 const avatarImage = document.createElement('img');
                 avatarImage.src = 'avatars/' + user.avatar + '.jpg';
@@ -670,5 +680,37 @@ function insertColumnToDatabase(columnName) {
     });
 
 </script>
+<script>
+    function verifyUser() {
+        <?php if ($row) { ?>
+            <?php
+            $username = $row["username"];
+            $userQuery = "SELECT avatar, color FROM users WHERE username = ?";
+            $stmtUser = $conn->prepare($userQuery);
+            $stmtUser->bind_param("s", $username);
+            $stmtUser->execute();
+            $userResult = $stmtUser->get_result();
+
+            if ($userResult->num_rows > 0) {
+                $userRow = $userResult->fetch_assoc();
+                $avatar = $userRow["avatar"];
+                $color = $userRow["color"];
+                ?>
+                <?php $_SESSION["username"] = $username; ?>
+                <?php $_SESSION["avatar"] = $avatar; ?>
+                <?php $_SESSION["color"] = $color; ?>
+                var userColor = "<?php echo $color; ?>"; // Assign the color value to a JavaScript variable
+            <?php }
+            else { ?>
+                var exampleModal = new bootstrap.Modal(document.getElementById("exampleModal"));
+                exampleModal.show();
+            <?php } ?>
+        <?php } ?>
+    }
+    
+    window.addEventListener('load', verifyUser);
+</script>
+
+
 </body>
 </html>

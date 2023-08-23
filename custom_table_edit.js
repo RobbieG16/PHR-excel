@@ -1,5 +1,4 @@
 $(document).ready(function () {
-  // Fetch column names from PHP using AJAX
   $.ajax({
     url: "get_column_names.php",
     method: "GET",
@@ -18,40 +17,48 @@ $(document).ready(function () {
         },
         hideIdentifier: false,
         url: "live_edit.php",
-        onDraw: function() {
-          // Initialize a callback for when the table is redrawn after an edit
-          $('#data_table').off('draw.dt').on('draw.dt', function() {
-            $('#data_table').load(location.href + " #data_table"); // Refresh the table content
-          });
-        },
       });
     },
     error: function (xhr, status, error) {
       console.error("AJAX error:", error);
     }
   });
-});
+  $(document).ready(function () {
+    // Event delegation to detect when a cell enters edit mode
+    $('#data_table').on('focusin', 'td.tabledit-edit-mode input', function() {
+      $(this).closest('td').css('outline', '3px solid ' + userColor);
+    });
+    
+  // Listen for focusin event on editable cells
+  $('#data_table').on('focusin', 'td[contenteditable="true"]', function() {
+    $(this).css('outline', '3px solid ' + userColor);
+  });
 
-$(document).ready(function () {
+  // Listen for focusout event on editable cells
+  $('#data_table').on('focusout', 'td[contenteditable="true"]', function() {
+    $(this).css('outline', 'none');
+  });
+
   // Event listener for header edits
   $("th[contenteditable='true']").on("input", function () {
     var newHeaderValue = $(this).text().trim();
-    var columnHeaderIndex = $(this).index() -1; // Get the index of the edited header
+    var columnHeaderIndex = $(this).index() - 1;
 
     // Send the updated header data to the server using AJAX
     $.ajax({
-      url: "update_header.php", // Your PHP script to handle header updates
+      url: "update_header.php",
       method: "POST",
       data: {
         newHeaderValue: newHeaderValue,
         columnHeaderIndex: columnHeaderIndex,
       },
       success: function (response) {
-        console.log(response); // Log the server response
+        console.log(response);
       },
       error: function (xhr, status, error) {
         console.error("AJAX error:", error);
       },
     });
   });
+});
 });
