@@ -105,7 +105,7 @@ $userLoggedIn = isset($_SESSION["userLoggedIn"]) && $_SESSION["userLoggedIn"] ==
 
 <?php 
 include_once("db_connect.php");
-include("header.php"); 
+
 $columns_query = "SHOW COLUMNS FROM developers";
 $columns_result = mysqli_query($conn, $columns_query) or die("database error: " . mysqli_error($conn));
 
