@@ -19,10 +19,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $stmt = $conn->prepare($query);
         $stmt->bind_param("sss", $username, $avatar, $color);
 
-        // $updateQuery = "UPDATE users SET availability = 1 WHERE avatar = '$avatar'";
-        
-        // mysqli_query($conn, $updateQuery);
-
         if ($stmt->execute()) {
             $response = array("success" => true);
             echo json_encode($response);

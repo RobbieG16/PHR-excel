@@ -19,9 +19,8 @@
 
     $("#loginForm").submit(function(event) {
 
-event.preventDefault(); // prevent normal submit
+event.preventDefault();
 
-// AJAX submit
 $.ajax({
   url: "login.php",
   data: {

@@ -4,7 +4,6 @@ $input = filter_input_array(INPUT_POST);
 if ($input['action'] == 'edit') {
     $update_fields = '';
 
-    // Iterate through all input fields except 'action' and 'id'
     foreach ($input as $column => $value) {
         if ($column !== 'action' && $column !== 'id') {
             if ($update_fields !== '') {

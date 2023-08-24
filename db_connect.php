@@ -1,5 +1,4 @@
 <?php
-/* Database connection start */
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -10,7 +9,6 @@ if (mysqli_connect_errno()) {
     exit();
 }
 
-// Function to check if the chosen avatar is already assigned to another user
 function isAvatarAssignedToAnotherUser($avatar)
 {
     global $conn;
@@ -26,21 +24,16 @@ function isAvatarAssignedToAnotherUser($avatar)
 }
 
 
-// Function to insert data into the database
 function insertDataToDB($data)
 {
     global $conn;
     
-    $avatar = $data['avatar']; // The chosen avatar value (not sanitized since it's already predefined)
+    $avatar = $data['avatar'];
     $color = $data['color'];
     $username = $data['username'];
-
-    // Check if the chosen avatar is already assigned to another user
     if (isAvatarAssignedToAnotherUser($avatar)) {
         return array("success" => false, "error" => "Avatar already assigned to another user.");
     }
-
-    // Insert user details into the users table
     $userSql = "INSERT INTO users (username, avatar, color) VALUES (?, ?, ?)";
     $userStmt = $conn->prepare($userSql);
     $userStmt->bind_param("sss", $username, $avatar, $color);
@@ -48,13 +41,11 @@ function insertDataToDB($data)
     
     $conn->begin_transaction();
     try {
-        // Execute the queries
         $userStmt->execute();
         
         $conn->commit();
         return array("success" => true);
     } catch (Exception $e) {
-        // Rollback the transaction in case of an error
         $conn->rollback();
         return array("success" => false, "error" => "Error inserting data: " . $e->getMessage());
     }

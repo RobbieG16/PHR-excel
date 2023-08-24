@@ -24,27 +24,22 @@ $(document).ready(function () {
     }
   });
   $(document).ready(function () {
-    // Event delegation to detect when a cell enters edit mode
     $('#data_table').on('focusin', 'td.tabledit-edit-mode input', function() {
       $(this).closest('td').css('outline', '3px solid ' + userColor);
     });
     
-  // Listen for focusin event on editable cells
   $('#data_table').on('focusin', 'td[contenteditable="true"]', function() {
     $(this).css('outline', '3px solid ' + userColor);
   });
 
-  // Listen for focusout event on editable cells
   $('#data_table').on('focusout', 'td[contenteditable="true"]', function() {
     $(this).css('outline', 'none');
   });
 
-  // Event listener for header edits
   $("th[contenteditable='true']").on("input", function () {
     var newHeaderValue = $(this).text().trim();
     var columnHeaderIndex = $(this).index() - 1;
 
-    // Send the updated header data to the server using AJAX
     $.ajax({
       url: "update_header.php",
       method: "POST",

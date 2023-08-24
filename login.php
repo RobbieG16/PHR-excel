@@ -1,7 +1,5 @@
 <?php
 session_start();
-
-// Define constants for the database connection
 define('DB_HOST', 'localhost');
 define('DB_USERNAME', 'root');
 define('DB_PASSWORD', '');
@@ -16,7 +14,6 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     die('Could not connect to the database: ' . mysqli_connect_error());
   }
 
-  // Check if the username and password exist in the database
   $query = mysqli_query($conn, "SELECT * FROM login WHERE username='$username' AND password='$password'");
   if ($query) {
     $row = mysqli_fetch_assoc($query);

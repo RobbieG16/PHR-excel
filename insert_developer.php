@@ -1,11 +1,6 @@
 <?php
 include_once("db_connect.php");
-
-
-
-// Validate the user input
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Get the column names from your_table_name
     $tableName = 'developers';
     $columnNames = array();
     $sql = "SHOW COLUMNS FROM $tableName";
@@ -15,13 +10,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $columnNames[] = $row['Field'];
         }
     }
-
-    // Construct the INSERT query
     $columns = implode(", ", $columnNames);
     $values = implode(", ", array_fill(0, count($columnNames), "NULL"));
     $insertQuery = "INSERT INTO $tableName ($columns) VALUES ($values)";
-
-    // Insert the row with all null values
     if ($conn->query($insertQuery) === TRUE) {
         echo "Row with all null values inserted successfully.";
         echo "<script>window.location.replace('index.php');</script>";
@@ -32,7 +23,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     echo "Invalid input. Please submit the form.";
 }
 
-// Close the connection
 $conn->close();
 ?>
 ?>

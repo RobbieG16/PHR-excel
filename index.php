@@ -5,13 +5,15 @@ $userLoggedIn = isset($_SESSION["userLoggedIn"]) && $_SESSION["userLoggedIn"] ==
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PHR - Excel</title>
     <script src="custom_table_edit.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script>
-    // Function to update the table content with fetched data
     function updateTable(data) {
         var tableBody = document.getElementById("data_table").getElementsByTagName("tbody")[0];
         tableBody.innerHTML = "";
@@ -44,7 +46,6 @@ $userLoggedIn = isset($_SESSION["userLoggedIn"]) && $_SESSION["userLoggedIn"] ==
         });
     }
 
-    // Set the refresh interval
     const refreshInterval = 5000;
 
 
@@ -78,18 +79,7 @@ $userLoggedIn = isset($_SESSION["userLoggedIn"]) && $_SESSION["userLoggedIn"] ==
         }
 
         $username = $_SESSION["username"];
-        
-        // $assignedAvatar = $_SESSION["avatar"];
-        // $assignedColor = $_SESSION["color"];
-        // $username = $_SESSION["username"];
-        // Check if the user is coming from the landing page
-        // Check if the user exists in the users table
-// $userQuery = "SELECT * FROM users WHERE username = ?";
-// $stmtUser = $conn->prepare($userQuery);
-// $stmtUser->bind_param("s", $username);
-// $stmtUser->execute();
-// $userResult = $stmtUser->get_result();
-// $userExists = $userResult->num_rows > 0;
+
     ?>
     <h1>Welcome, <?php echo $username?></h1>
     
@@ -101,7 +91,6 @@ $userLoggedIn = isset($_SESSION["userLoggedIn"]) && $_SESSION["userLoggedIn"] ==
         </div>
     <?php
          include_once("db_connect.php");
-            // Fetch all users' data from the database
             $query = "SELECT avatar, color FROM users";
             $result = mysqli_query($conn, $query);
 
@@ -109,7 +98,6 @@ $userLoggedIn = isset($_SESSION["userLoggedIn"]) && $_SESSION["userLoggedIn"] ==
                 $avatar = $row['avatar'];
                 $color = $row['color'];
 
-                // Generate the HTML and JavaScript for each user's avatar
                 echo '<img src="avatars/' . $avatar . '.jpg" alt="User Avatar" style="max-width: 40px; max-height: 40px; border: 3px solid ' . $color . ';">';
             }
     ?>
@@ -118,13 +106,12 @@ $userLoggedIn = isset($_SESSION["userLoggedIn"]) && $_SESSION["userLoggedIn"] ==
 <?php 
 include_once("db_connect.php");
 include("header.php"); 
-// Fetch column names from the 'developers' table
 $columns_query = "SHOW COLUMNS FROM developers";
 $columns_result = mysqli_query($conn, $columns_query) or die("database error: " . mysqli_error($conn));
 
 $column_names = array();
 while ($column = mysqli_fetch_assoc($columns_result)) {
-    if ($column['Field'] !== 'id') { // Exclude the 'id' column
+    if ($column['Field'] !== 'id') {
         $column_names[] = $column['Field'];
     }
 }
@@ -338,10 +325,7 @@ function saveUserDetails() {
     const avatar = document.querySelector("input[name='avatar']:checked").value;
     const color = document.querySelector("input[name='color']:checked").value;
 
-    // const editableCells = document.querySelectorAll("td[contenteditable='true']");
-    // for (const cell of editableCells) {
-    //     cell.style.outlineColor = color;
-    // }
+
 
     const userAvatar = document.getElementById("userAvatar");
     userAvatar.src = "avatars/" + avatar + ".jpg";
@@ -428,18 +412,7 @@ function logout() {
                         <button type="submit" class="btn btn-primary"><i class="bi bi-layout-three-columns"></i> Add Column</button>
                     </form>
                 </div>
-                
-                <!-- <div class="col-3">
-                    <form action="reset.php" method="post" class="mt-3">
-                        <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-clockwise"></i> Reset Table</button>
-                    </form>
-                </div>
 
-                <div class="col-3">
-                    <form action="reset.php" method="post" class="mt-3">
-                        <button type="submit" class="btn btn-primary"><i class="bi bi-download"></i> Export</button>
-                    </form>
-                </div> -->
                 <br><br></br>
                 <div class ="col-3">
                     <form>
@@ -451,14 +424,12 @@ function logout() {
     </div>
 	
 	
-    <!-- <div id="loginModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">> -->
     <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Login</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                    <!-- <span aria-hidden="true">&times;</span> -->
                 </button>
             </div>
             <div class="modal-body">
@@ -482,7 +453,6 @@ function logout() {
         </div>
     </div>
 </div>
-<!-- Add a button to trigger the login modal -->
 <div class="logout" style="height: 40px">
     <?php if (!$userLoggedIn) { ?>
         <button type="button" class="btn btn-primary" onclick="logout()">
@@ -505,7 +475,7 @@ function logout() {
         <?php 
     $sql_query = "SELECT * FROM developers";
     $resultset = mysqli_query($conn, $sql_query) or die("database error:". mysqli_error($conn));
-    $row_number = 1; // Initialize row number
+    $row_number = 1;
     while ($developer = mysqli_fetch_assoc($resultset)) {
     ?>
         <tr style="height: 55px;">
@@ -522,29 +492,22 @@ function logout() {
 		</tbody>
         </table>
 	<form id="developerForm">
-        <!-- Input fields for developer data -->
-        <!-- Add appropriate input fields for app_status, jobseeker_fname, etc. -->
         <button type="button" id="insertButton" class="btn btn-primary"><i class="bi bi-plus-square"></i> Insert Row</button>
     </form>
 </div>
 <script>
 	$(document).ready(function () {
     $("#insertButton").on("click", function () {
-        // Get the column names from the table header
         var columnNames = [];
         $("#data_table th").each(function () {
-            if ($(this).text() !== "#") { // Exclude the first column
+            if ($(this).text() !== "#") {
                 columnNames.push($(this).text());
             }
         });
-
-        // Create an object with the input values
         var formData = {};
         columnNames.forEach(function (columnName) {
             formData[columnName] = $("#" + columnName).val();
         });
-
-        // Send the data to the back-end PHP file using AJAX
         $.ajax({
             type: "POST",
             url: "insert_developer.php",
@@ -562,19 +525,16 @@ function logout() {
 
 $(document).ready(function () {
     $("th[contenteditable='true']").on("blur", function () {
-        var newHeaderValue = $(this).text(); // Get the modified header value
-        var columnHeaderIndex = $(this).index(); // Get the index of the modified header
-
-        // Send the updated header value and index to the server using AJAX
+        var newHeaderValue = $(this).text();
+        var columnHeaderIndex = $(this).index();
         $.ajax({
             type: "POST",
-            url: "update_header.php", // Replace with the actual PHP file name and path
+            url: "update_header.php",
             data: {
                 newHeaderValue: newHeaderValue,
                 columnHeaderIndex: columnHeaderIndex,
             },
             success: function (response) {
-                // Handle success, such as updating the UI if needed
             },
             error: function (xhr, status, error) {
                 alert("An error occurred: " + error);
@@ -617,31 +577,21 @@ $(document).ready(function() {
         event.preventDefault();
 
     const newColumnName = document.getElementById('newColumnName').value;
-
-    // Call a PHP script to insert the column into the database
     insertColumnToDatabase(newColumnName);
 });
 
 function insertColumnToDatabase(columnName) {
-    // Make an AJAX request to a PHP script to handle the database insertion
     $.ajax({
         type: 'POST',
-        url: 'insert_column.php', // Replace with the actual PHP file name and path
+        url: 'insert_column.php',
         data: { columnName: columnName },
         success: function (response) {
-            // Update the table in the UI
             var table = $('#data_table');
-
-            // Add the new header to the table header row
             var th = $('<th>').text(columnName).attr('contenteditable', 'true'); // Make the header editable
             table.find('thead tr').append(th);
-
-            // Add a cell for the new column in each row
             table.find('tbody tr').each(function () {
                 $(this).append('<td contenteditable="true"></td>');
             });
-
-            // Show the response from the server (success message or error)
             alert(response);
         },
         error: function (xhr, status, error) {
@@ -663,15 +613,7 @@ function insertColumnToDatabase(columnName) {
 }</style>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
 <script type="text/javascript" src="custom_table_edit.js"></script>
-<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
-<?php include('footer.php');?>
-<!-- <script>
-    // Use vanilla JavaScript to show the user modal on page load
-    document.addEventListener("DOMContentLoaded", function() {
-        var exampleModal = new bootstrap.Modal(document.getElementById("exampleModal"));
-        exampleModal.show();
-    });
-</script> -->
+
 <script>
     const ws = new WebSocket("ws://localhost: 5500");
 
@@ -699,7 +641,7 @@ function insertColumnToDatabase(columnName) {
                 <?php $_SESSION["username"] = $username; ?>
                 <?php $_SESSION["avatar"] = $avatar; ?>
                 <?php $_SESSION["color"] = $color; ?>
-                var userColor = "<?php echo $color; ?>"; // Assign the color value to a JavaScript variable
+                var userColor = "<?php echo $color; ?>";
             <?php }
             else { ?>
                 var exampleModal = new bootstrap.Modal(document.getElementById("exampleModal"));
@@ -711,6 +653,6 @@ function insertColumnToDatabase(columnName) {
     window.addEventListener('load', verifyUser);
 </script>
 
-
+<div class="insert-post-ads1" style="margin-top:20px;"></div>
 </body>
 </html>

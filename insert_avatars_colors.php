@@ -1,5 +1,5 @@
 <?php
-include_once("db_connect.php"); // Include your database connection script
+include_once("db_connect.php");
 
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
